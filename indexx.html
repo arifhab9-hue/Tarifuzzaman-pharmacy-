@@ -36,17 +36,36 @@
 
         #main-app { display: none; }
 
+        /* Full Width Header Styling */
         header {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            padding: 10px;
+            padding: 0;
             text-align: center;
+            width: 100%;
+            position: relative;
         }
 
         header img {
-            max-width: 100%;
+            width: 100%;
             height: auto;
-            border-radius: 8px;
+            display: block;
+        }
+
+        /* Language Switcher Button */
+        .lang-switch {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1001;
         }
 
         .tabs { display: flex; background: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow-x: auto; }
@@ -87,39 +106,40 @@
 
 <div id="login-overlay">
     <div class="login-box">
-        <h2>লগইন করুন</h2>
-        <input type="text" id="login-user" placeholder="ইউজার নেম" style="margin-bottom: 10px;">
-        <input type="password" id="login-pass" placeholder="পাসওয়ার্ড" style="margin-bottom: 15px;">
-        <button class="btn btn-save" onclick="checkLogin()">প্রবেশ করুন</button>
-        <p id="login-error" style="color: red; font-size: 12px; margin-top: 10px; display: none;">ভুল ইউজার নেম বা পাসওয়ার্ড!</p>
+        <h2 class="lang" data-bn="লগইন করুন" data-en="Login Now">লগইন করুন</h2>
+        <input type="text" id="login-user" placeholder="ইউজার নেম" class="lang-p" data-bn="ইউজার নেম" data-en="Username" style="margin-bottom: 10px;">
+        <input type="password" id="login-pass" placeholder="পাসওয়ার্ড" class="lang-p" data-bn="পাসওয়ার্ড" data-en="Password" style="margin-bottom: 15px;">
+        <button class="btn btn-save lang" data-bn="প্রবেশ করুন" data-en="Login" onclick="checkLogin()">প্রবেশ করুন</button>
+        <p id="login-error" style="color: red; font-size: 12px; margin-top: 10px; display: none;" class="lang" data-bn="ভুল ইউজার নেম বা পাসওয়ার্ড!" data-en="Invalid Username or Password!">ভুল ইউজার নেম বা পাসওয়ার্ড!</p>
     </div>
 </div>
 
 <div id="main-app">
     <header>
+        <button class="lang-switch" onclick="toggleLanguage()">English</button>
         <a href="https://ibb.co.com/BVkGmvJX"><img src="https://i.ibb.co.com/jvtzdqYc/Tarifuzzaman.png" alt="Tarifuzzaman Banner"></a>
     </header>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="showTab('dashboard')">ড্যাশবোর্ড</button>
-        <button class="tab-btn" onclick="showTab('sales')">ওষুধ বিক্রি</button>
-        <button class="tab-btn" onclick="showTab('inventory')">স্টক ও ক্রয়</button>
-        <button class="tab-btn" onclick="showTab('current-stock-tab')">বর্তমান স্টক</button>
-        <button class="tab-btn" onclick="showTab('med-setup')">ওষুধ সেটআপ</button>
-        <button class="tab-btn" onclick="showTab('data-storage')">তথ্য ভাণ্ডার</button>
-        <button class="tab-btn" onclick="showTab('dues')">বাকির খাতা</button>
-        <button class="tab-btn" onclick="showTab('due-reports')">বাকির রিপোর্ট</button>
-        <button class="tab-btn" onclick="showTab('finance-report')">ক্রয়-বিক্রয় রিপোর্ট</button>
+        <button class="tab-btn active lang" data-bn="ড্যাশবোর্ড" data-en="Dashboard" onclick="showTab('dashboard')">ড্যাশবোর্ড</button>
+        <button class="tab-btn lang" data-bn="ওষুধ বিক্রি" data-en="Sales" onclick="showTab('sales')">ওষুধ বিক্রি</button>
+        <button class="tab-btn lang" data-bn="স্টক ও ক্রয়" data-en="Inventory" onclick="showTab('inventory')">স্টক ও ক্রয়</button>
+        <button class="tab-btn lang" data-bn="বর্তমান স্টক" data-en="Current Stock" onclick="showTab('current-stock-tab')">বর্তমান স্টক</button>
+        <button class="tab-btn lang" data-bn="ওষুধ সেটআপ" data-en="Med Setup" onclick="showTab('med-setup')">ওষুধ সেটআপ</button>
+        <button class="tab-btn lang" data-bn="তথ্য ভাণ্ডার" data-en="Data Store" onclick="showTab('data-storage')">তথ্য ভাণ্ডার</button>
+        <button class="tab-btn lang" data-bn="বাকির খাতা" data-en="Dues Book" onclick="showTab('dues')">বাকির খাতা</button>
+        <button class="tab-btn lang" data-bn="বাকির রিপোর্ট" data-en="Due Reports" onclick="showTab('due-reports')">বাকির রিপোর্ট</button>
+        <button class="tab-btn lang" data-bn="ক্রয়-বিক্রয় রিপোর্ট" data-en="Finance Report" onclick="showTab('finance-report')">ক্রয়-বিক্রয় রিপোর্ট</button>
     </div>
 
     <div id="dashboard" class="content active">
         <div class="grid">
             <div class="card" style="border-left: 8px solid var(--success);">
-                <h3>আজকের বিক্রি</h3>
+                <h3 class="lang" data-bn="আজকের বিক্রি" data-en="Today's Sales">আজকের বিক্রি</h3>
                 <h2 id="today-total">৳ 0</h2>
             </div>
             <div class="card" style="border-left: 8px solid var(--primary);">
-                <h3>এই মাসের মোট বিক্রি</h3>
+                <h3 class="lang" data-bn="এই মাসের মোট বিক্রি" data-en="Monthly Sales">এই মাসের মোট বিক্রি</h3>
                 <h2 id="month-total">৳ 0</h2>
             </div>
         </div>
@@ -127,31 +147,31 @@
 
     <div id="sales" class="content">
         <div class="card">
-            <h3>ওষুধ বিক্রি এন্ট্রি</h3>
+            <h3 class="lang" data-bn="ওষুধ বিক্রি এন্ট্রি" data-en="Sales Entry">ওষুধ বিক্রি এন্ট্রি</h3>
             <table id="sales-entry-table">
                 <thead>
                     <tr>
-                        <th style="width: 30%;">ওষুধের নাম</th>
-                        <th style="width: 20%;">ধরন</th>
-                        <th>পরিমাণ</th>
-                        <th>একক</th>
-                        <th>দাম</th>
+                        <th style="width: 30%;" class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th>
+                        <th style="width: 20%;" class="lang" data-bn="ধরন" data-en="Type">ধরন</th>
+                        <th class="lang" data-bn="পরিমাণ" data-en="Qty">পরিমাণ</th>
+                        <th class="lang" data-bn="একক" data-en="Unit">একক</th>
+                        <th class="lang" data-bn="দাম" data-en="Price">দাম</th>
                     </tr>
                 </thead>
                 <tbody id="sales-rows"></tbody>
             </table>
-            <button class="btn btn-add" onclick="addSaleRow()">+ আরো ওষুধ যোগ করুন</button>
+            <button class="btn btn-add lang" data-bn="+ আরো ওষুধ যোগ করুন" data-en="+ Add More Medicine" onclick="addSaleRow()">+ আরো ওষুধ যোগ করুন</button>
             <div style="margin-top: 20px;">
-                <button class="btn btn-save" onclick="saveBulkSales()">বিক্রি নিশ্চিত করুন</button>
+                <button class="btn btn-save lang" data-bn="বিক্রি নিশ্চিত করুন" data-en="Confirm Sale" onclick="saveBulkSales()">বিক্রি নিশ্চিত করুন</button>
             </div>
         </div>
     </div>
 
     <div id="inventory" class="content">
         <div class="card">
-            <h3>নতুন ওষুধ স্টকে যোগ করুন</h3>
+            <h3 class="lang" data-bn="নতুন ওষুধ স্টকে যোগ করুন" data-en="Add New Stock">নতুন ওষুধ স্টকে যোগ করুন</h3>
             <div class="grid" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;">
-                <input type="text" id="p-name" placeholder="ওষুধের নাম" list="med-list">
+                <input type="text" id="p-name" placeholder="ওষুধের নাম" class="lang-p" data-bn="ওষুধের নাম" data-en="Medicine Name" list="med-list">
                 <select id="p-type">
                     <option value="ট্যাবলেট">ট্যাবলেট</option>
                     <option value="ক্যাপসুল">ক্যাপসুল</option>
@@ -160,24 +180,25 @@
                     <option value="ড্রপ">ড্রপ</option>
                     <option value="সাপোজিটরি">সাপোজিটরি</option>
                     <option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                    <option value="Powder">Powder</option>
                 </select>
-                <input type="text" id="p-company" placeholder="কোম্পানি">
+                <input type="text" id="p-company" placeholder="কোম্পানি" class="lang-p" data-bn="কোম্পানি" data-en="Company">
                 <input type="number" id="p-qty" placeholder="পরিমাণ" style="width: 80px;">
                 <select id="p-qnty-unit" style="width: 90px;">
                     <option value="Box">Box</option>
                     <option value="Pcs">Pcs</option>
                 </select>
-                <input type="number" id="p-cost" placeholder="কেনা দাম">
+                <input type="number" id="p-cost" placeholder="কেনা দাম" class="lang-p" data-bn="কেনা দাম" data-en="Cost Price">
             </div>
-            <button class="btn btn-save" onclick="addPurchase()">স্টক আপডেট করুন</button>
+            <button class="btn btn-save lang" data-bn="স্টক আপডেট করুন" data-en="Update Stock" onclick="addPurchase()">স্টক আপডেট করুন</button>
         </div>
     </div>
 
     <div id="current-stock-tab" class="content">
         <div class="card" style="overflow-x:auto;">
-            <h3>বর্তমান স্টক রিপোর্ট</h3>
+            <h3 class="lang" data-bn="বর্তমান স্টক রিপোর্ট" data-en="Current Stock Report">বর্তমান স্টক রিপোর্ট</h3>
             <table id="stock-table">
-                <thead><tr><th>নাম</th><th>ধরন</th><th>কোম্পানি</th><th>স্টক</th><th>স্ট্যাটাস</th></tr></thead>
+                <thead><tr><th class="lang" data-bn="নাম" data-en="Name">নাম</th><th class="lang" data-bn="ধরন" data-en="Type">ধরন</th><th class="lang" data-bn="কোম্পানি" data-en="Company">কোম্পানি</th><th class="lang" data-bn="স্টক" data-en="Stock">স্টক</th><th class="lang" data-bn="স্ট্যাটাস" data-en="Status">স্ট্যাটাস</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -185,9 +206,9 @@
 
     <div id="med-setup" class="content">
         <div class="card">
-            <h3>ওষুধের ধরন সেটআপ</h3>
+            <h3 class="lang" data-bn="ওষুধের ধরন সেটআপ" data-en="Medicine Type Setup">ওষুধের ধরন সেটআপ</h3>
             <div class="grid">
-                <input type="text" id="setup-name" placeholder="ওষুধের নাম">
+                <input type="text" id="setup-name" placeholder="ওষুধের নাম" class="lang-p" data-bn="ওষুধের নাম" data-en="Medicine Name">
                 <select id="setup-type">
                     <option value="ট্যাবলেট">ট্যাবলেট</option>
                     <option value="ক্যাপসুল">ক্যাপসুল</option>
@@ -196,17 +217,18 @@
                     <option value="ড্রপ">ড্রপ</option>
                     <option value="সাপোজিটরি">সাপোজিটরি</option>
                     <option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                    <option value="Powder">Powder</option>
                 </select>
-                <button class="btn btn-save" onclick="saveMedSetup()">সেভ করুন</button>
+                <button class="btn btn-save lang" data-bn="সেভ করুন" data-en="Save Now" onclick="saveMedSetup()">সেভ করুন</button>
             </div>
         </div>
     </div>
 
     <div id="data-storage" class="content">
         <div class="card">
-            <h3>তথ্য ভান্ডার (ওষুধের তালিকা)</h3>
+            <h3 class="lang" data-bn="তথ্য ভান্ডার (ওষুধের তালিকা)" data-en="Data Store (Medicine List)">তথ্য ভান্ডার (ওষুধের তালিকা)</h3>
             <table id="med-setup-list">
-                <thead><tr><th>ওষুধের নাম</th><th>ধরন</th></tr></thead>
+                <thead><tr><th class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th><th class="lang" data-bn="ধরন" data-en="Type">ধরন</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -214,48 +236,56 @@
 
     <div id="dues" class="content">
         <div id="due-form" class="card">
-            <h3>নতুন বাকি এন্ট্রি</h3>
+            <h3 class="lang" data-bn="নতুন বাকি এন্ট্রি" data-en="New Due Entry">নতুন বাকি এন্ট্রি</h3>
             <div class="grid">
-                <input type="text" id="d-customer" placeholder="কাস্টমারের নাম">
-                <input type="text" id="d-mobile" placeholder="মোবাইল নম্বর">
-                <input type="text" id="d-village" placeholder="গ্রাম">
-                <input type="text" id="d-union" placeholder="ইউনিয়ন">
+                <input type="text" id="d-customer" placeholder="কাস্টমারের নাম" class="lang-p" data-bn="কাস্টমারের নাম" data-en="Customer Name">
+                <input type="text" id="d-mobile" placeholder="মোবাইল নম্বর" class="lang-p" data-bn="মোবাইল নম্বর" data-en="Mobile No">
+                <input type="text" id="d-village" placeholder="গ্রাম" class="lang-p" data-bn="গ্রাম" data-en="Village">
+                <input type="text" id="d-union" placeholder="ইউনিয়ন" class="lang-p" data-bn="ইউনিয়ন" data-en="Union">
             </div>
             <div id="due-med-rows">
                 <div class="grid" style="grid-template-columns: 2fr 0.8fr 0.8fr 1.2fr 1fr;">
-                    <input type="text" class="dm-name" placeholder="ওষুধের নাম">
-                    <input type="number" class="dm-qty" placeholder="পরিমাণ">
-                    <select class="dm-unit"><option value="Box">Box</option><option value="Pcs">Pcs</option></select>
+                    <input type="text" class="dm-name lang-p" placeholder="ওষুধের নাম" data-bn="ওষুধের নাম" data-en="Medicine Name">
+                    <input type="number" class="dm-qty" placeholder="Qty">
+                    <select class="dm-unit">
+                        <option value="Box">Box</option>
+                        <option value="Pcs">Pcs</option>
+                    </select>
                     <select class="dm-type">
-                        <option value="ট্যাবলেট">ট্যাবলেট</option><option value="ক্যাপসুল">ক্যাপসুল</option>
-                        <option value="সিরাপ">সিরাপ</option><option value="ইনজেকশন">ইনজেকশন</option>
-                        <option value="ড্রপ">ড্রপ</option><option value="সাপোজিটরি">সাপোজিটরি</option><option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                        <option value="ট্যাবলেট">ট্যাবলেট</option>
+                        <option value="ক্যাপসুল">ক্যাপসুল</option>
+                        <option value="সিরাপ">সিরাপ</option>
+                        <option value="ইনজেকশন">ইনজেকশন</option>
+                        <option value="ড্রপ">ড্রপ</option>
+                        <option value="সাপোজিটরি">সাপোজিটরি</option>
+                        <option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                        <option value="Powder">Powder</option>
                     </select>
                 </div>
             </div>
             <div class="grid">
-                <input type="number" id="d-total" placeholder="মোট টাকা">
-                <input type="number" id="d-paid" placeholder="জমা দিয়েছে">
+                <input type="number" id="d-total" placeholder="মোট টাকা" class="lang-p" data-bn="মোট টাকা" data-en="Total Amount">
+                <input type="number" id="d-paid" placeholder="জমা দিয়েছে" class="lang-p" data-bn="জমা দিয়েছে" data-en="Paid Amount">
             </div>
-            <button class="btn btn-save" style="background:var(--danger); margin-bottom: 10px;" onclick="addDue()">বাকির খাতায় যোগ করুন</button>
-            <button class="btn btn-add" onclick="addDueMedRow()">আরও ওষুধ যোগ করুন</button>
+            <button class="btn btn-save lang" style="background:var(--danger); margin-bottom: 10px;" data-bn="বাকির খাতায় যোগ করুন" data-en="Add to Due Book" onclick="addDue()">বাকির খাতায় যোগ করুন</button>
+            <button class="btn btn-add lang" data-bn="আরও ওষুধ যোগ করুন" data-en="Add More Medicine" onclick="addDueMedRow()">আরও ওষুধ যোগ করুন</button>
         </div>
     </div>
 
     <div id="due-reports" class="content">
         <div class="card" style="overflow-x:auto;">
-            <h3>বাকির বিস্তারিত রিপোর্ট</h3>
-            <button class="btn btn-pdf" onclick="downloadPDF('due-table', 'Due_Report')">PDF ডাউনলোড করুন</button>
+            <h3 class="lang" data-bn="বাকির বিস্তারিত রিপোর্ট" data-en="Detailed Due Report">বাকির বিস্তারিত রিপোর্ট</h3>
+            <button class="btn btn-pdf lang" data-bn="PDF ডাউনলোড করুন" data-en="Download PDF" onclick="downloadPDF('due-table', 'Due_Report')">PDF ডাউনলোড করুন</button>
             <table id="due-table">
                 <thead>
                     <tr>
-                        <th>তারিখ ও কাস্টমার</th>
-                        <th>ঠিকানা ও মোবাইল</th>
-                        <th>ওষুধের বিবরণ</th>
-                        <th>মোট টাকা</th>
-                        <th>জমা (ইতিহাস)</th>
-                        <th>বাকি টাকা</th>
-                        <th>অ্যাকশন</th>
+                        <th class="lang" data-bn="তারিখ ও কাস্টমার" data-en="Date & Customer">তারিখ ও কাস্টমার</th>
+                        <th class="lang" data-bn="ঠিকানা ও মোবাইল" data-en="Address & Mobile">ঠিকানা ও মোবাইল</th>
+                        <th class="lang" data-bn="ওষুধের বিবরণ" data-en="Medicine Details">ওষুধের বিবরণ</th>
+                        <th class="lang" data-bn="মোট টাকা" data-en="Total">মোট টাকা</th>
+                        <th class="lang" data-bn="জমা (ইতিহাস)" data-en="Paid (History)">জমা (ইতিহাস)</th>
+                        <th class="lang" data-bn="বাকি টাকা" data-en="Due">বাকি টাকা</th>
+                        <th class="lang" data-bn="অ্যাকশন" data-en="Action">অ্যাকশন</th>
                     </tr>
                 </thead>
                 <tbody id="due-list-body"></tbody>
@@ -265,47 +295,47 @@
 
     <div id="finance-report" class="content">
         <div class="card">
-            <h3>ক্রয় ও বিক্রয় রিপোর্ট</h3>
+            <h3 class="lang" data-bn="ক্রয় ও বিক্রয় রিপোর্ট" data-en="Finance Report">ক্রয় ও বিক্রয় রিপোর্ট</h3>
             <div class="report-grid" style="margin-bottom: 20px;">
                 <div class="report-card bg-sale">
-                    <h4>আজকের বিক্রি: <span id="rep-today-sale">৳ 0</span></h4>
-                    <p>আজকের মোট ক্রয়: <span id="rep-today-buy">৳ 0</span></p>
+                    <h4 class="lang" data-bn="আজকের বিক্রি:" data-en="Today Sale:">আজকের বিক্রি: <span id="rep-today-sale">৳ 0</span></h4>
+                    <p class="lang" data-bn="আজকের মোট ক্রয়:" data-en="Today Purchase:">আজকের মোট ক্রয়: <span id="rep-today-buy">৳ 0</span></p>
                 </div>
                 <div class="report-card bg-purchase">
-                    <h4>এই মাসের বিক্রি: <span id="rep-month-sale">৳ 0</span></h4>
-                    <p>এই মাসের ক্রয়: <span id="rep-month-buy">৳ 0</span></p>
+                    <h4 class="lang" data-bn="এই মাসের বিক্রি:" data-en="Monthly Sale:">এই মাসের বিক্রি: <span id="rep-month-sale">৳ 0</span></h4>
+                    <p class="lang" data-bn="এই মাসের ক্রয়:" data-en="Monthly Purchase:">এই মাসের ক্রয়: <span id="rep-month-buy">৳ 0</span></p>
                 </div>
                 <div class="report-card" style="background: #34495e;">
-                    <h4>এই বছরের বিক্রি: <span id="rep-year-sale">৳ 0</span></h4>
-                    <p>এই বছরের ক্রয়: <span id="rep-year-buy">৳ 0</span></p>
+                    <h4 class="lang" data-bn="এই বছরের বিক্রি:" data-en="Yearly Sale:">এই বছরের বিক্রি: <span id="rep-year-sale">৳ 0</span></h4>
+                    <p class="lang" data-bn="এই বছরের ক্রয়:" data-en="Yearly Purchase:">এই বছরের ক্রয়: <span id="rep-year-buy">৳ 0</span></p>
                 </div>
             </div>
 
             <hr>
-            <h3>বিক্রয় রিপোর্ট (তালিকা)</h3>
-            <button class="btn btn-pdf" onclick="downloadPDF('sale-history-table', 'Sales_Report')">বিক্রয় PDF ডাউনলোড</button>
+            <h3 class="lang" data-bn="বিক্রয় রিপোর্ট (তালিকা)" data-en="Sales List">বিক্রয় রিপোর্ট (তালিকা)</h3>
+            <button class="btn btn-pdf lang" data-bn="বিক্রয় PDF ডাউনলোড" data-en="Download Sales PDF" onclick="downloadPDF('sale-history-table', 'Sales_Report')">বিক্রয় PDF ডাউনলোড</button>
             <table id="sale-history-table">
                 <thead>
                     <tr>
-                        <th>তারিখ</th>
-                        <th>ওষুধের নাম</th>
-                        <th>পরিমাণ</th>
-                        <th>টাকা</th>
+                        <th class="lang" data-bn="তারিখ" data-en="Date">তারিখ</th>
+                        <th class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th>
+                        <th class="lang" data-bn="পরিমাণ" data-en="Qty">পরিমাণ</th>
+                        <th class="lang" data-bn="টাকা" data-en="Amount">টাকা</th>
                     </tr>
                 </thead>
                 <tbody id="sale-history-body"></tbody>
             </table>
 
             <br><hr>
-            <h3>ক্রয় রিপোর্ট (তালিকা)</h3>
-            <button class="btn btn-pdf" onclick="downloadPDF('purchase-history-table', 'Purchase_Report')">ক্রয় PDF ডাউনলোড</button>
+            <h3 class="lang" data-bn="ক্রয় রিপোর্ট (তালিকা)" data-en="Purchase List">ক্রয় রিপোর্ট (তালিকা)</h3>
+            <button class="btn btn-pdf lang" data-bn="ক্রয় PDF ডাউনলোড" data-en="Download Purchase PDF" onclick="downloadPDF('purchase-history-table', 'Purchase_Report')">ক্রয় PDF ডাউনলোড</button>
             <table id="purchase-history-table">
                 <thead>
                     <tr>
-                        <th>তারিখ</th>
-                        <th>ওষুধের নাম</th>
-                        <th>পরিমাণ</th>
-                        <th>কেনা দাম</th>
+                        <th class="lang" data-bn="তারিখ" data-en="Date">তারিখ</th>
+                        <th class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th>
+                        <th class="lang" data-bn="পরিমাণ" data-en="Qty">পরিমাণ</th>
+                        <th class="lang" data-bn="কেনা দাম" data-en="Cost">কেনা দাম</th>
                     </tr>
                 </thead>
                 <tbody id="purchase-history-body"></tbody>
@@ -330,6 +360,22 @@
     const db = firebase.database();
 
     let medicineMaster = {}; 
+    let currentLang = 'bn';
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'bn' ? 'en' : 'bn';
+        document.querySelector('.lang-switch').innerText = currentLang === 'bn' ? 'English' : 'বাংলা';
+        
+        // Update Text
+        document.querySelectorAll('.lang').forEach(el => {
+            el.innerText = el.getAttribute('data-' + currentLang);
+        });
+
+        // Update Placeholders
+        document.querySelectorAll('.lang-p').forEach(el => {
+            el.placeholder = el.getAttribute('data-' + currentLang);
+        });
+    }
 
     function checkLogin() {
         const user = document.getElementById('login-user').value;
@@ -372,6 +418,7 @@
                     <option value="ড্রপ">ড্রপ</option>
                     <option value="সাপোজিটরি">সাপোজিটরি</option>
                     <option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                    <option value="Powder">Powder</option>
                 </select>
             </td>
             <td><input type="number" class="row-qty" value="1"></td>
@@ -394,6 +441,7 @@
                 <option value="ট্যাবলেট">ট্যাবলেট</option><option value="ক্যাপসুল">ক্যাপসুল</option>
                 <option value="সিরাপ">সিরাপ</option><option value="ইনজেকশন">ইনজেকশন</option>
                 <option value="ড্রপ">ড্রপ</option><option value="সাপোজিটরি">সাপোজিটরি</option><option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                <option value="Powder">Powder</option>
             </select>
         `;
         container.appendChild(div);
