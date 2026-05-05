@@ -1,3 +1,5 @@
+--- START OF FILE AA.html ---
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -6,12 +8,17 @@
     <title>TARIFUZZAMAN PHARMACY</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
+    <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <!-- Html2Canvas for better rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
@@ -19,6 +26,7 @@
             --success: #00b09b;
             --danger: #ff5f6d;
             --dark: #2c3e50;
+            --header-bg: #e8f5e9; 
         }
 
         body { font-family: 'Hind Siliguri', sans-serif; background: #f4f7f6; margin: 0; }
@@ -36,63 +44,88 @@
 
         #main-app { display: none; }
 
-        /* Full Width Header Styling */
         header {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 0;
-            text-align: center;
-            width: 100%;
-            position: relative;
+            color: white; padding: 0; text-align: center; width: 100%; position: relative;
         }
+        header img { width: 100%; height: auto; display: block; }
 
-        header img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* Language Switcher Button */
+        /* Language Switcher Position */
         .lang-switch {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            color: var(--primary);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 1001;
+            position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9);
+            border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;
+            font-weight: bold; color: var(--primary); z-index: 1001;
         }
+
+        /* Logout Button Positioned below Language Switcher */
+        .logout-btn {
+            position: absolute; top: 55px; right: 10px; background: rgba(231, 76, 60, 0.9);
+            border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;
+            font-weight: bold; color: white; z-index: 1001; transition: 0.3s;
+        }
+        .logout-btn:hover { background: #c0392b; }
 
         .tabs { display: flex; background: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow-x: auto; }
-        .tab-btn { flex: 1; padding: 15px; border: none; background: none; cursor: pointer; font-weight: bold; font-size: 14px; color: var(--dark); min-width: 100px; transition: 0.3s; }
-        .tab-btn.active { color: #1e3c72; border-bottom: 4px solid #1e3c72; background: #f0f4ff; }
+        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; color: white; min-width: 100px; transition: 0.3s; }
+        
+        .tab-btn:nth-child(1) { background: #2c3e50; } 
+        .tab-btn:nth-child(2) { background: #27ae60; } 
+        .tab-btn:nth-child(3) { background: #2980b9; } 
+        .tab-btn:nth-child(4) { background: #8e44ad; } 
+        .tab-btn:nth-child(5) { background: #f39c12; } 
+        .tab-btn:nth-child(6) { background: #d35400; } 
+        .tab-btn:nth-child(7) { background: #c0392b; } 
+        .tab-btn:nth-child(8) { background: #16a085; } 
+        .tab-btn:nth-child(9) { background: #444; }    
+
+        .tab-btn.active { border-bottom: 4px solid #fff; opacity: 0.8; transform: scale(1.02); }
 
         .content { padding: 20px; max-width: 1200px; margin: auto; display: none; }
         .content.active { display: block; }
 
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card h3 { 
+            background: var(--header-bg); 
+            padding: 12px; 
+            border-radius: 8px; 
+            color: #2e7d32; 
+            margin-top: 0; 
+            border-bottom: 2px solid #c8e6c9;
+        }
 
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px; }
         input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; font-family: inherit; }
         
+        .search-container {
+            position: relative;
+            margin-bottom: 15px;
+            max-width: 400px;
+        }
+        .search-container input {
+            padding-left: 35px;
+            border: 2px solid var(--primary);
+        }
+        .search-container i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+        }
+
         .btn { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
         .btn-save { background: var(--success); color: white; }
         .btn-add { background: #6c757d; color: white; margin-top: 10px; }
-        .btn-nav { background: var(--primary); color: white; margin-bottom: 15px; width: auto; padding: 10px 20px; text-decoration: none; display: inline-block; }
         .btn-pdf { background: #e74c3c; color: white; margin-bottom: 10px; width: auto; }
+        .btn-edit { background: #3498db; color: white; padding: 4px 8px; font-size: 12px; }
+        .btn-delete { background: #c0392b; color: white; padding: 4px 8px; font-size: 12px; } 
+        .btn-warning { background: #f39c12; color: white; padding: 4px 8px; font-size: 12px; } 
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; font-size: 13px; }
         th, td { padding: 10px; border: 1px solid #eee; text-align: left; vertical-align: top; }
         th { background: #f8f9fa; }
 
-        .pay-history { font-size: 11px; color: #666; margin-top: 5px; border-left: 2px solid #ddd; padding-left: 5px; list-style: none; padding: 0 0 0 8px; }
-        .pay-history li { margin-bottom: 2px; }
-
+        .pay-history { font-size: 11px; color: #666; margin-top: 5px; border-left: 2px solid #ddd; padding-left: 8px; list-style: none; }
         .low-stock { color: #ff0000; font-weight: bold; animation: blinker 1.5s linear infinite; }
         @keyframes blinker { 50% { opacity: 0.2; } }
 
@@ -100,6 +133,38 @@
         .report-card { padding: 15px; border-radius: 8px; color: white; }
         .bg-sale { background: #27ae60; }
         .bg-purchase { background: #e67e22; }
+
+        @media (max-width: 600px) {
+            #sales-entry-table thead { display: none; }
+            #sales-entry-table tr { 
+                display: block; 
+                border: 2px solid #eee; 
+                margin-bottom: 15px; 
+                padding: 10px; 
+                border-radius: 10px;
+                background: #fdfdfd;
+            }
+            #sales-entry-table td { 
+                display: block; 
+                width: 100% !important; 
+                padding: 5px 0; 
+                border: none; 
+            }
+            .inventory-grid {
+                grid-template-columns: 1fr !important;
+            }
+            #due-med-rows .grid {
+                grid-template-columns: 1fr !important;
+            }
+            /* Adjust buttons for mobile header */
+            .lang-switch { padding: 5px 10px; font-size: 12px; }
+            .logout-btn { padding: 5px 10px; font-size: 12px; top: 45px; }
+        }
+
+        @media print {
+            .tabs, .btn, .search-container, .lang-switch, .logout-btn { display: none !important; }
+            .content { display: block !important; }
+        }
     </style>
 </head>
 <body>
@@ -107,9 +172,9 @@
 <div id="login-overlay">
     <div class="login-box">
         <h2 class="lang" data-bn="লগইন করুন" data-en="Login Now">লগইন করুন</h2>
-        <input type="text" id="login-user" placeholder="ইউজার নেম" class="lang-p" data-bn="ইউজার নেম" data-en="Username" style="margin-bottom: 10px;">
-        <input type="password" id="login-pass" placeholder="পাসওয়ার্ড" class="lang-p" data-bn="পাসওয়ার্ড" data-en="Password" style="margin-bottom: 15px;">
-        <button class="btn btn-save lang" data-bn="প্রবেশ করুন" data-en="Login" onclick="checkLogin()">প্রবেশ করুন</button>
+        <input type="text" id="login-user" placeholder="ইউজার নেম" class="lang-p" data-bn="ইউজার নেম" data-en="Username">
+        <input type="password" id="login-pass" placeholder="পাসওয়ার্ড" class="lang-p" data-bn="পাসওয়ার্ড" data-en="Password" style="margin-top:10px;">
+        <button class="btn btn-save lang" data-bn="প্রবেশ করুন" data-en="Login" onclick="checkLogin()" style="margin-top:15px;">প্রবেশ করুন</button>
         <p id="login-error" style="color: red; font-size: 12px; margin-top: 10px; display: none;" class="lang" data-bn="ভুল ইউজার নেম বা পাসওয়ার্ড!" data-en="Invalid Username or Password!">ভুল ইউজার নেম বা পাসওয়ার্ড!</p>
     </div>
 </div>
@@ -117,7 +182,9 @@
 <div id="main-app">
     <header>
         <button class="lang-switch" onclick="toggleLanguage()">English</button>
-        <a href="https://ibb.co.com/BVkGmvJX"><img src="https://i.ibb.co.com/jvtzdqYc/Tarifuzzaman.png" alt="Tarifuzzaman Banner"></a>
+        <!-- Logout button updated to be English only and positioned below -->
+        <button class="logout-btn" onclick="logout()">Logout</button>
+        <img src="https://i.ibb.co.com/jvtzdqYc/Tarifuzzaman.png" alt="Tarifuzzaman Banner">
     </header>
 
     <div class="tabs">
@@ -132,6 +199,7 @@
         <button class="tab-btn lang" data-bn="ক্রয়-বিক্রয় রিপোর্ট" data-en="Finance Report" onclick="showTab('finance-report')">ক্রয়-বিক্রয় রিপোর্ট</button>
     </div>
 
+    <!-- Dashboard -->
     <div id="dashboard" class="content active">
         <div class="grid">
             <div class="card" style="border-left: 8px solid var(--success);">
@@ -145,6 +213,7 @@
         </div>
     </div>
 
+    <!-- Sales -->
     <div id="sales" class="content">
         <div class="card">
             <h3 class="lang" data-bn="ওষুধ বিক্রি এন্ট্রি" data-en="Sales Entry">ওষুধ বিক্রি এন্ট্রি</h3>
@@ -167,26 +236,29 @@
         </div>
     </div>
 
+    <!-- Inventory -->
     <div id="inventory" class="content">
         <div class="card">
             <h3 class="lang" data-bn="নতুন ওষুধ স্টকে যোগ করুন" data-en="Add New Stock">নতুন ওষুধ স্টকে যোগ করুন</h3>
-            <div class="grid" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;">
+            <div class="grid inventory-grid" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;">
                 <input type="text" id="p-name" placeholder="ওষুধের নাম" class="lang-p" data-bn="ওষুধের নাম" data-en="Medicine Name" list="med-list">
                 <select id="p-type">
-                    <option value="ট্যাবলেট">ট্যাবলেট</option>
-                    <option value="ক্যাপসুল">ক্যাপসুল</option>
-                    <option value="সিরাপ">সিরাপ</option>
-                    <option value="ইনজেকশন">ইনজেকশন</option>
-                    <option value="ড্রপ">ড্রপ</option>
-                    <option value="সাপোজিটরি">সাপোজিটরি</option>
-                    <option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                    <option value="Tablet">Tablet</option>
+                    <option value="Capsul">Capsul</option>
+                    <option value="Syrup">Syrup</option>
+                    <option value="Injection">Injection</option>
+                    <option value="Drop">Drop</option>
+                    <option value="Ointment/ Cream">Ointment/ Cream</option>
                     <option value="Powder">Powder</option>
                 </select>
                 <input type="text" id="p-company" placeholder="কোম্পানি" class="lang-p" data-bn="কোম্পানি" data-en="Company">
-                <input type="number" id="p-qty" placeholder="পরিমাণ" style="width: 80px;">
-                <select id="p-qnty-unit" style="width: 90px;">
-                    <option value="Box">Box</option>
+                <input type="number" id="p-qty" placeholder="পরিমাণ">
+                <select id="p-qnty-unit">
                     <option value="Pcs">Pcs</option>
+                    <option value="পাতা/ Strip">পাতা/ Strip</option>
+                    <option value="mLt">mLt</option>
+                    <option value="Ltr">Ltr</option>
+                    <option value="Box">Box</option>
                 </select>
                 <input type="number" id="p-cost" placeholder="কেনা দাম" class="lang-p" data-bn="কেনা দাম" data-en="Cost Price">
             </div>
@@ -194,29 +266,36 @@
         </div>
     </div>
 
+    <!-- Current Stock -->
     <div id="current-stock-tab" class="content">
         <div class="card" style="overflow-x:auto;">
             <h3 class="lang" data-bn="বর্তমান স্টক রিপোর্ট" data-en="Current Stock Report">বর্তমান স্টক রিপোর্ট</h3>
+            
+            <div class="search-container">
+                <i class="fa fa-search"></i>
+                <input type="text" id="stock-search" onkeyup="filterTable('stock-table', 0, 2)" placeholder="ওষুধ বা কোম্পানি খুঁজুন..." class="lang-p" data-bn="ওষুধ বা কোম্পানি খুঁজুন..." data-en="Search Medicine or Company...">
+            </div>
+
             <table id="stock-table">
-                <thead><tr><th class="lang" data-bn="নাম" data-en="Name">নাম</th><th class="lang" data-bn="ধরন" data-en="Type">ধরন</th><th class="lang" data-bn="কোম্পানি" data-en="Company">কোম্পানি</th><th class="lang" data-bn="স্টক" data-en="Stock">স্টক</th><th class="lang" data-bn="স্ট্যাটাস" data-en="Status">স্ট্যাটাস</th></tr></thead>
+                <thead><tr><th class="lang" data-bn="নাম" data-en="Name">নাম</th><th class="lang" data-bn="ধরন" data-en="Type">ধরন</th><th class="lang" data-bn="কোম্পানি" data-en="Company">কোম্পানি</th><th class="lang" data-bn="স্টক" data-en="Stock">স্টক</th><th class="lang" data-bn="একক" data-en="Unit">একক</th><th class="lang" data-bn="স্ট্যাটাস" data-en="Status">স্ট্যাটাস</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
 
+    <!-- Med Setup -->
     <div id="med-setup" class="content">
         <div class="card">
             <h3 class="lang" data-bn="ওষুধের ধরন সেটআপ" data-en="Medicine Type Setup">ওষুধের ধরন সেটআপ</h3>
             <div class="grid">
                 <input type="text" id="setup-name" placeholder="ওষুধের নাম" class="lang-p" data-bn="ওষুধের নাম" data-en="Medicine Name">
                 <select id="setup-type">
-                    <option value="ট্যাবলেট">ট্যাবলেট</option>
-                    <option value="ক্যাপসুল">ক্যাপসুল</option>
-                    <option value="সিরাপ">সিরাপ</option>
-                    <option value="ইনজেকশন">ইনজেকশন</option>
-                    <option value="ড্রপ">ড্রপ</option>
-                    <option value="সাপোজিটরি">সাপোজিটরি</option>
-                    <option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                    <option value="Tablet">Tablet</option>
+                    <option value="Capsul">Capsul</option>
+                    <option value="Syrup">Syrup</option>
+                    <option value="Injection">Injection</option>
+                    <option value="Drop">Drop</option>
+                    <option value="Ointment/ Cream">Ointment/ Cream</option>
                     <option value="Powder">Powder</option>
                 </select>
                 <button class="btn btn-save lang" data-bn="সেভ করুন" data-en="Save Now" onclick="saveMedSetup()">সেভ করুন</button>
@@ -224,16 +303,18 @@
         </div>
     </div>
 
+    <!-- Data Store -->
     <div id="data-storage" class="content">
         <div class="card">
             <h3 class="lang" data-bn="তথ্য ভান্ডার (ওষুধের তালিকা)" data-en="Data Store (Medicine List)">তথ্য ভান্ডার (ওষুধের তালিকা)</h3>
             <table id="med-setup-list">
-                <thead><tr><th class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th><th class="lang" data-bn="ধরন" data-en="Type">ধরন</th></tr></thead>
+                <thead><tr><th class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th><th class="lang" data-bn="ধরন" data-en="Type">ধরন</th><th class="lang" data-bn="অ্যাকশন" data-en="Action">অ্যাকশন</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
 
+    <!-- Bakir Khata -->
     <div id="dues" class="content">
         <div id="due-form" class="card">
             <h3 class="lang" data-bn="নতুন বাকি এন্ট্রি" data-en="New Due Entry">নতুন বাকি এন্ট্রি</h3>
@@ -245,20 +326,22 @@
             </div>
             <div id="due-med-rows">
                 <div class="grid" style="grid-template-columns: 2fr 0.8fr 0.8fr 1.2fr 1fr;">
-                    <input type="text" class="dm-name lang-p" placeholder="ওষুধের নাম" data-bn="ওষুধের নাম" data-en="Medicine Name">
+                    <input type="text" class="dm-name lang-p" placeholder="ওষুধের নাম" data-bn="ওষুধের নাম" data-en="Medicine Name" list="med-list">
                     <input type="number" class="dm-qty" placeholder="Qty">
                     <select class="dm-unit">
-                        <option value="Box">Box</option>
                         <option value="Pcs">Pcs</option>
+                        <option value="পাতা/ Strip">পাতা/ Strip</option>
+                        <option value="mLt">mLt</option>
+                        <option value="Ltr">Ltr</option>
+                        <option value="Box">Box</option>
                     </select>
                     <select class="dm-type">
-                        <option value="ট্যাবলেট">ট্যাবলেট</option>
-                        <option value="ক্যাপসুল">ক্যাপসুল</option>
-                        <option value="সিরাপ">সিরাপ</option>
-                        <option value="ইনজেকশন">ইনজেকশন</option>
-                        <option value="ড্রপ">ড্রপ</option>
-                        <option value="সাপোজিটরি">সাপোজিটরি</option>
-                        <option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                        <option value="Tablet">Tablet</option>
+                        <option value="Capsul">Capsul</option>
+                        <option value="Syrup">Syrup</option>
+                        <option value="Injection">Injection</option>
+                        <option value="Drop">Drop</option>
+                        <option value="Ointment/ Cream">Ointment/ Cream</option>
                         <option value="Powder">Powder</option>
                     </select>
                 </div>
@@ -272,9 +355,16 @@
         </div>
     </div>
 
+    <!-- Due Reports -->
     <div id="due-reports" class="content">
         <div class="card" style="overflow-x:auto;">
             <h3 class="lang" data-bn="বাকির বিস্তারিত রিপোর্ট" data-en="Detailed Due Report">বাকির বিস্তারিত রিপোর্ট</h3>
+            
+            <div class="search-container">
+                <i class="fa fa-user-tag"></i>
+                <input type="text" id="due-search" onkeyup="filterTable('due-table', 0, 1)" placeholder="নাম বা মোবাইল নম্বর দিয়ে খুঁজুন..." class="lang-p" data-bn="নাম বা মোবাইল নম্বর দিয়ে খুঁজুন..." data-en="Search Name or Mobile...">
+            </div>
+
             <button class="btn btn-pdf lang" data-bn="PDF ডাউনলোড করুন" data-en="Download PDF" onclick="downloadPDF('due-table', 'Due_Report')">PDF ডাউনলোড করুন</button>
             <table id="due-table">
                 <thead>
@@ -293,6 +383,7 @@
         </div>
     </div>
 
+    <!-- Finance Report -->
     <div id="finance-report" class="content">
         <div class="card">
             <h3 class="lang" data-bn="ক্রয় ও বিক্রয় রিপোর্ট" data-en="Finance Report">ক্রয় ও বিক্রয় রিপোর্ট</h3>
@@ -347,6 +438,7 @@
 <datalist id="med-list"></datalist>
 
 <script>
+    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyC6uyHpnG0FiUA-lvG3Ev99-H3KQFG2wqw",
         authDomain: "tarifhparmecy.firebaseapp.com",
@@ -362,19 +454,20 @@
     let medicineMaster = {}; 
     let currentLang = 'bn';
 
+    // Helper: Get Current Date in English format (DD/MM/YYYY)
+    function getEnglishDate() {
+        const d = new Date();
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
     function toggleLanguage() {
         currentLang = currentLang === 'bn' ? 'en' : 'bn';
         document.querySelector('.lang-switch').innerText = currentLang === 'bn' ? 'English' : 'বাংলা';
-        
-        // Update Text
-        document.querySelectorAll('.lang').forEach(el => {
-            el.innerText = el.getAttribute('data-' + currentLang);
-        });
-
-        // Update Placeholders
-        document.querySelectorAll('.lang-p').forEach(el => {
-            el.placeholder = el.getAttribute('data-' + currentLang);
-        });
+        document.querySelectorAll('.lang').forEach(el => { el.innerText = el.getAttribute('data-' + currentLang); });
+        document.querySelectorAll('.lang-p').forEach(el => { el.placeholder = el.getAttribute('data-' + currentLang); });
     }
 
     function checkLogin() {
@@ -388,42 +481,67 @@
         }
     }
 
+    function logout() {
+        document.getElementById('login-user').value = '';
+        document.getElementById('login-pass').value = '';
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
+
     function showTab(id) {
         document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if(event) event.currentTarget.classList.add('active');
+        if(event && event.currentTarget) event.currentTarget.classList.add('active');
+    }
+
+    function filterTable(tableId, col1, col2) {
+        let input = event.target.value.toLowerCase();
+        let table = document.getElementById(tableId);
+        let tr = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            let td1 = tr[i].getElementsByTagName("td")[col1];
+            let td2 = tr[i].getElementsByTagName("td")[col2];
+            if (td1 || td2) {
+                let text1 = td1.textContent || td1.innerText;
+                let text2 = td2 ? (td2.textContent || td2.innerText) : "";
+                if (text1.toLowerCase().indexOf(input) > -1 || text2.toLowerCase().indexOf(input) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
     }
 
     function autoFillType(input) {
         const row = input.closest('tr');
         const typeSelect = row.querySelector('.row-type');
         const name = input.value;
-        if(medicineMaster[name]) {
-            typeSelect.value = medicineMaster[name].type;
-        }
+        if(medicineMaster[name]) { typeSelect.value = medicineMaster[name].type; }
     }
 
     function addSaleRow() {
         const tbody = document.getElementById('sales-rows');
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td><input type="text" class="row-name" list="med-list" oninput="autoFillType(this)"></td>
-            <td>
-                <select class="row-type">
-                    <option value="ট্যাবলেট">ট্যাবলেট</option>
-                    <option value="ক্যাপসুল">ক্যাপসুল</option>
-                    <option value="সিরাপ">সিরাপ</option>
-                    <option value="ইনজেকশন">ইনজেকশন</option>
-                    <option value="ড্রপ">ড্রপ</option>
-                    <option value="সাপোজিটরি">সাপোজিটরি</option>
-                    <option value="মলম/ক্রিম">মলম/ক্রিম</option>
-                    <option value="Powder">Powder</option>
-                </select>
-            </td>
-            <td><input type="number" class="row-qty" value="1"></td>
-            <td><select class="row-unit"><option value="পাতা">পাতা</option><option value="পিস">পিস</option><option value="ফাইল">ফাইল</option><option value="Box">Box</option></select></td>
-            <td><input type="number" class="row-price" step="any"></td>
+            <td><input type="text" class="row-name" placeholder="ওষুধের নাম" list="med-list" oninput="autoFillType(this)"></td>
+            <td><select class="row-type">
+                <option value="Tablet">Tablet</option><option value="Capsul">Capsul</option>
+                <option value="Syrup">Syrup</option><option value="Injection">Injection</option>
+                <option value="Drop">Drop</option><option value="Ointment/ Cream">Ointment/ Cream</option>
+                <option value="Powder">Powder</option>
+            </select></td>
+            <td><input type="number" class="row-qty" placeholder="পরিমাণ" value="1"></td>
+            <td><select class="row-unit">
+                <option value="Pcs">Pcs</option>
+                <option value="পাতা/ Strip">পাতা/ Strip</option>
+                <option value="mLt">mLt</option>
+                <option value="Ltr">Ltr</option>
+                <option value="Box">Box</option>
+            </select></td>
+            <td><input type="number" class="row-price" placeholder="দাম (৳)" step="any"></td>
         `;
         tbody.appendChild(row);
     }
@@ -434,13 +552,19 @@
         div.className = "grid";
         div.style.gridTemplateColumns = "2fr 0.8fr 0.8fr 1.2fr 1fr";
         div.innerHTML = `
-            <input type="text" class="dm-name" placeholder="ওষুধের নাম">
-            <input type="number" class="dm-qty" placeholder="পরিমাণ">
-            <select class="dm-unit"><option value="Box">Box</option><option value="Pcs">Pcs</option></select>
+            <input type="text" class="dm-name" placeholder="ওষুধের নাম" list="med-list">
+            <input type="number" class="dm-qty" placeholder="Qty">
+            <select class="dm-unit">
+                <option value="Pcs">Pcs</option>
+                <option value="পাতা/ Strip">পাতা/ Strip</option>
+                <option value="mLt">mLt</option>
+                <option value="Ltr">Ltr</option>
+                <option value="Box">Box</option>
+            </select>
             <select class="dm-type">
-                <option value="ট্যাবলেট">ট্যাবলেট</option><option value="ক্যাপসুল">ক্যাপসুল</option>
-                <option value="সিরাপ">সিরাপ</option><option value="ইনজেকশন">ইনজেকশন</option>
-                <option value="ড্রপ">ড্রপ</option><option value="সাপোজিটরি">সাপোজিটরি</option><option value="মলম/ক্রিম">মলম/ক্রিম</option>
+                <option value="Tablet">Tablet</option><option value="Capsul">Capsul</option>
+                <option value="Syrup">Syrup</option><option value="Injection">Injection</option>
+                <option value="Drop">Drop</option><option value="Ointment/ Cream">Ointment/ Cream</option>
                 <option value="Powder">Powder</option>
             </select>
         `;
@@ -456,16 +580,27 @@
         alert("ওষুধ ডাটাবেসে যোগ হয়েছে");
     }
 
+    function editMed(name, oldType) {
+        const newName = prompt("ওষুধের নাম পরিবর্তন করুন:", name);
+        const newType = prompt("নতুন ধরন লিখুন:", oldType);
+        if(newName && newType) {
+            db.ref('medicine_master/' + name).remove();
+            db.ref('medicine_master/' + newName).set({ type: newType });
+            alert("সফলভাবে পরিবর্তন করা হয়েছে");
+        }
+    }
+
     function saveBulkSales() {
         const rows = document.querySelectorAll('#sales-rows tr');
-        const date = new Date().toLocaleDateString('bn-BD');
+        const date = getEnglishDate(); 
         const timestamp = new Date().getTime();
         rows.forEach(row => {
             const name = row.querySelector('.row-name').value;
             const price = parseFloat(row.querySelector('.row-price').value);
             const qty = parseInt(row.querySelector('.row-qty').value);
+            const unit = row.querySelector('.row-unit').value;
             if(name && !isNaN(price)) { 
-                db.ref('sales').push({ name, price, qty, date, timestamp }); 
+                db.ref('sales').push({ name, price, qty, unit, date, timestamp }); 
                 db.ref('inventory/' + name).once('value', s => {
                     if(s.exists()){
                         let newStock = s.val().stock - qty;
@@ -483,20 +618,14 @@
         const type = document.getElementById('p-type').value;
         const qty = parseInt(document.getElementById('p-qty').value);
         const cost = parseFloat(document.getElementById('p-cost').value) || 0;
-        const date = new Date().toLocaleDateString('bn-BD');
-        const timestamp = new Date().getTime();
-        
+        const unit = document.getElementById('p-qnty-unit').value;
+        const date = getEnglishDate();
         if(!name || isNaN(qty)) return;
-        
-        db.ref('purchases').push({ name, qty, cost, date, timestamp });
-
+        db.ref('purchases').push({ name, qty, unit, cost, date, timestamp: new Date().getTime() });
         db.ref('inventory/' + name).once('value', s => {
             let current = s.exists() ? (s.val().stock || 0) : 0;
             db.ref('inventory/' + name).set({ 
-                stock: current + qty, 
-                type, 
-                unit: document.getElementById('p-qnty-unit').value,
-                company: document.getElementById('p-company').value 
+                stock: current + qty, type, company: document.getElementById('p-company').value, unit: unit 
             });
         });
         alert("স্টক আপডেট হয়েছে");
@@ -506,47 +635,80 @@
         const name = document.getElementById('d-customer').value;
         const total = parseFloat(document.getElementById('d-total').value);
         const paid = parseFloat(document.getElementById('d-paid').value) || 0;
-        const date = new Date().toLocaleDateString('bn-BD');
-        
+        const date = getEnglishDate();
         if(!name || isNaN(total)) return alert("কাস্টমারের নাম এবং মোট টাকা দিন");
-        
         let medDetails = [];
         document.querySelectorAll('#due-med-rows .grid').forEach(row => {
-            const mName = row.querySelector('.dm-name').value;
-            const mQty = row.querySelector('.dm-qty').value;
-            const mUnit = row.querySelector('.dm-unit').value;
-            if(mName) medDetails.push(`${mName} (${mQty} ${mUnit})`);
+            const mN = row.querySelector('.dm-name').value;
+            const mQ = row.querySelector('.dm-qty').value;
+            const mU = row.querySelector('.dm-unit').value;
+            if(mN) medDetails.push(`${mN} (${mQ} ${mU})`);
         });
-
-        const data = {
-            name, total, paid, due: total - paid, date,
+        db.ref('dues').push({
+            name, total, paid, due: total - paid, date, meds: medDetails.join(', '),
             mobile: document.getElementById('d-mobile').value,
-            address: `গ্রাম: ${document.getElementById('d-village').value}, ইউ: ${document.getElementById('d-union').value}`,
-            meds: medDetails.join(', '),
+            address: `${document.getElementById('d-village').value}, ${document.getElementById('d-union').value}`,
             history: [{date, amount: paid}]
-        };
-        
-        db.ref('dues').push(data).then(() => {
-            alert("বাকির তথ্য সেভ হয়েছে");
-            location.reload();
-        });
+        }).then(() => { alert("বাকির তথ্য সেভ হয়েছে"); location.reload(); });
     }
 
     function updateDuePayment(key, currentPaid, currentTotal, history) {
-        const newAmount = parseFloat(prompt("জমার পরিমাণ লিখুন:"));
-        if(isNaN(newAmount) || newAmount <= 0) return;
-        const updatedPaid = currentPaid + newAmount;
+        const amount = parseFloat(prompt("জমার পরিমাণ লিখুন:"));
+        if(isNaN(amount) || amount <= 0) return;
+        const updatedPaid = currentPaid + amount;
         const newHistory = history || [];
-        newHistory.push({ date: new Date().toLocaleDateString('bn-BD'), amount: newAmount });
+        newHistory.push({ date: getEnglishDate(), amount });
         db.ref('dues/' + key).update({ paid: updatedPaid, due: currentTotal - updatedPaid, history: newHistory });
     }
 
-    function downloadPDF(tableId, fileName) {
+    function editDue(key, oldName, oldMobile, oldTotal, oldPaid) {
+        const newName = prompt("কাস্টমারের নাম পরিবর্তন করুন:", oldName);
+        if(newName === null) return; 
+        const newMobile = prompt("মোবাইল নম্বর পরিবর্তন করুন:", oldMobile);
+        const newTotal = prompt("মোট টাকা পরিবর্তন করুন (৳):", oldTotal);
+        
+        if(newName !== null && newTotal !== null) {
+            const parsedTotal = parseFloat(newTotal);
+            if(!isNaN(parsedTotal)) {
+                db.ref('dues/' + key).update({
+                    name: newName,
+                    mobile: newMobile || "",
+                    total: parsedTotal,
+                    due: parsedTotal - oldPaid
+                });
+                alert("রেকর্ড আপডেট করা হয়েছে!");
+            } else {
+                alert("ভুল টাকার পরিমাণ!");
+            }
+        }
+    }
+
+    function deleteDue(key) {
+        if(confirm("আপনি কি নিশ্চিত যে এই বাকির রেকর্ডটি মুছে ফেলতে চান?")) {
+            db.ref('dues/' + key).remove();
+            alert("রেকর্ড মুছে ফেলা হয়েছে!");
+        }
+    }
+
+    async function downloadPDF(tableId, fileName) {
+        const element = document.getElementById(tableId);
+        const canvas = await html2canvas(element, { scale: 3, useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+        
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("TARIFUZZAMAN PHARMACY - Report", 14, 15);
-        doc.autoTable({ html: '#' + tableId, startY: 20 });
-        doc.save(fileName + ".pdf");
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        pdf.setFontSize(16);
+        pdf.text("TARIFUZZAMAN PHARMACY", pdfWidth / 2, 15, { align: 'center' });
+        
+        pdf.setFontSize(10);
+        pdf.text("Report: " + fileName, 10, 25);
+        pdf.text("Date: " + getEnglishDate(), 10, 30); 
+        
+        pdf.addImage(imgData, 'PNG', 5, 35, pdfWidth - 10, pdfHeight);
+        pdf.save(fileName + "_" + getEnglishDate() + ".pdf");
     }
 
     function syncAll() {
@@ -557,61 +719,60 @@
             list.innerHTML = ""; setupList.innerHTML = "";
             Object.keys(medicineMaster).forEach(name => {
                 list.innerHTML += `<option value="${name}">`;
-                setupList.innerHTML += `<tr><td>${name}</td><td>${medicineMaster[name].type}</td></tr>`;
+                setupList.innerHTML += `<tr><td>${name}</td><td>${medicineMaster[name].type}</td><td><button class="btn btn-edit" onclick="editMed('${name}', '${medicineMaster[name].type}')">Edit</button></td></tr>`;
             });
         });
 
-        const now = new Date();
-        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
-        const currentYear = now.getFullYear().toString();
-
         db.ref('sales').on('value', s => {
-            let tSale = 0, mSale = 0, ySale = 0;
-            const todayStr = now.toLocaleDateString('bn-BD');
-            const saleHistoryTbody = document.getElementById('sale-history-body');
-            saleHistoryTbody.innerHTML = "";
+            let tS = 0, mS = 0, yS = 0;
+            const now = new Date();
+            const curMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+            const curYear = now.getFullYear();
+            const todayStr = getEnglishDate();
 
+            const historyBody = document.getElementById('sale-history-body');
+            historyBody.innerHTML = "";
             s.forEach(child => {
                 const v = child.val();
-                if(v.date === todayStr) tSale += v.price;
-                if(v.date && v.date.includes('/' + currentMonth + '/')) mSale += v.price;
-                if(v.date && v.date.includes('/' + currentYear)) ySale += v.price;
-                
-                saleHistoryTbody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty}</td><td>৳${v.price}</td></tr>`;
+                if(v.date === todayStr) tS += v.price;
+                if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mS += v.price;
+                if(v.date && v.date.endsWith(`/${curYear}`)) yS += v.price;
+                historyBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty} ${v.unit || ''}</td><td>৳${v.price}</td></tr>`;
             });
-            
-            document.getElementById('today-total').innerText = "৳ " + tSale.toFixed(2);
-            document.getElementById('month-total').innerText = "৳ " + mSale.toFixed(2);
-            document.getElementById('rep-today-sale').innerText = "৳ " + tSale.toFixed(2);
-            document.getElementById('rep-month-sale').innerText = "৳ " + mSale.toFixed(2);
-            document.getElementById('rep-year-sale').innerText = "৳ " + ySale.toFixed(2);
+            document.getElementById('today-total').innerText = "৳ " + tS;
+            document.getElementById('month-total').innerText = "৳ " + mS;
+            document.getElementById('rep-today-sale').innerText = "৳ " + tS;
+            document.getElementById('rep-month-sale').innerText = "৳ " + mS;
+            document.getElementById('rep-year-sale').innerText = "৳ " + yS;
         });
 
         db.ref('purchases').on('value', s => {
-            let tBuy = 0, mBuy = 0, yBuy = 0;
-            const todayStr = now.toLocaleDateString('bn-BD');
-            const purchaseHistoryTbody = document.getElementById('purchase-history-body');
-            purchaseHistoryTbody.innerHTML = "";
+            let tB = 0, mB = 0, yB = 0;
+            const now = new Date();
+            const curMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+            const curYear = now.getFullYear();
+            const todayStr = getEnglishDate();
 
+            const purchaseBody = document.getElementById('purchase-history-body');
+            purchaseBody.innerHTML = "";
             s.forEach(child => {
                 const v = child.val();
-                if(v.date === todayStr) tBuy += v.cost;
-                if(v.date && v.date.includes('/' + currentMonth + '/')) mBuy += v.cost;
-                if(v.date && v.date.includes('/' + currentYear)) yBuy += v.cost;
-
-                purchaseHistoryTbody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty}</td><td>৳${v.cost}</td></tr>`;
+                if(v.date === todayStr) tB += v.cost;
+                if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mB += v.cost;
+                if(v.date && v.date.endsWith(`/${curYear}`)) yB += v.cost;
+                purchaseBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty} ${v.unit || ''}</td><td>৳${v.cost}</td></tr>`;
             });
-            document.getElementById('rep-today-buy').innerText = "৳ " + tBuy.toFixed(2);
-            document.getElementById('rep-month-buy').innerText = "৳ " + mBuy.toFixed(2);
-            document.getElementById('rep-year-buy').innerText = "৳ " + yBuy.toFixed(2);
+            document.getElementById('rep-today-buy').innerText = "৳ " + tB;
+            document.getElementById('rep-month-buy').innerText = "৳ " + mB;
+            document.getElementById('rep-year-buy').innerText = "৳ " + yB;
         });
 
         db.ref('inventory').on('value', s => {
             const tbody = document.querySelector("#stock-table tbody"); tbody.innerHTML = "";
             s.forEach(child => {
                 const d = child.val();
-                let stockStyle = d.stock < 10 ? "class='low-stock'" : "";
-                tbody.innerHTML += `<tr><td>${child.key}</td><td>${d.type}</td><td>${d.company}</td><td ${stockStyle}>${d.stock} ${d.unit || ''}</td><td>${d.stock < 10 ? "⚠️ কম" : "✅ পর্যাপ্ত"}</td></tr>`;
+                let cls = d.stock < 10 ? "class='low-stock'" : "";
+                tbody.innerHTML += `<tr><td>${child.key}</td><td>${d.type}</td><td>${d.company}</td><td ${cls}>${d.stock}</td><td>${d.unit || 'N/A'}</td><td>${d.stock < 10 ? "⚠️ কম" : "✅ পর্যাপ্ত"}</td></tr>`;
             });
         });
 
@@ -619,8 +780,23 @@
             const tbody = document.getElementById("due-list-body"); tbody.innerHTML = "";
             s.forEach(child => {
                 const d = child.val();
-                let historyHtml = (d.history || []).map(h => `<li>${h.date}: ৳${h.amount}</li>`).join('');
-                tbody.innerHTML += `<tr><td><b>${d.name}</b><br><small>${d.date}</small></td><td>${d.address}<br>${d.mobile}</td><td>${d.meds}</td><td>৳${d.total}</td><td>৳${d.paid}<ul class="pay-history">${historyHtml}</ul></td><td style="color:red; font-weight:bold">৳${d.due}</td><td><button class="btn btn-save" style="padding:5px; font-size:11px;" onclick="updateDuePayment('${child.key}', ${d.paid}, ${d.total}, ${JSON.stringify(d.history).replace(/"/g, '&quot;')})">জমা নিন</button></td></tr>`;
+                let hist = (d.history || []).map(h => `<li>${h.date}: ৳${h.amount}</li>`).join('');
+                let safeName = (d.name || '').replace(/'/g, "\\'");
+                let safeMobile = (d.mobile || '').replace(/'/g, "\\'");
+                
+                tbody.innerHTML += `<tr>
+                    <td><b>${d.name}</b><br><small>${d.date}</small></td>
+                    <td>${d.address || ''}<br>${d.mobile || ''}</td>
+                    <td>${d.meds || ''}</td>
+                    <td>৳${d.total}</td>
+                    <td>৳${d.paid}<ul class="pay-history">${hist}</ul></td>
+                    <td style="color:red; font-weight:bold">৳${d.due}</td>
+                    <td style="display:flex; flex-direction:column; gap:5px;">
+                        <button class="btn btn-save" style="padding:5px; font-size:11px;" onclick="updateDuePayment('${child.key}', ${d.paid}, ${d.total}, ${JSON.stringify(d.history || []).replace(/"/g, '&quot;')})">জমা নিন</button>
+                        <button class="btn btn-warning" style="padding:5px; font-size:11px;" onclick="editDue('${child.key}', '${safeName}', '${safeMobile}', ${d.total}, ${d.paid})">এডিট (Edit)</button>
+                        <button class="btn btn-delete" style="padding:5px; font-size:11px;" onclick="deleteDue('${child.key}')">ডিলিট (Delete)</button>
+                    </td>
+                </tr>`;
             });
         });
     }
