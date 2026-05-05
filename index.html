@@ -48,7 +48,6 @@
         }
         header img { width: 100%; height: auto; display: block; }
 
-        /* Language Switcher Position */
         .lang-switch {
             position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9);
             border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;
@@ -132,6 +131,7 @@
         .bg-sale { background: #27ae60; }
         .bg-purchase { background: #e67e22; }
 
+        /* Mobile Responsive Changes */
         @media (max-width: 600px) {
             #sales-entry-table thead { display: none; }
             #sales-entry-table tr { 
@@ -154,11 +154,9 @@
             #due-med-rows .grid {
                 grid-template-columns: 1fr !important;
             }
-            /* Adjust buttons for mobile header */
-            .lang-switch { padding: 5px 10px; font-size: 12px; }
-            .logout-btn { padding: 5px 10px; font-size: 12px; top: 45px; }
         }
 
+        /* Print Specific Styling */
         @media print {
             .tabs, .btn, .search-container, .lang-switch, .logout-btn { display: none !important; }
             .content { display: block !important; }
@@ -180,7 +178,6 @@
 <div id="main-app">
     <header>
         <button class="lang-switch" onclick="toggleLanguage()">English</button>
-        <!-- Logout button updated to be English only and positioned below -->
         <button class="logout-btn" onclick="logout()">Logout</button>
         <img src="https://i.ibb.co.com/jvtzdqYc/Tarifuzzaman.png" alt="Tarifuzzaman Banner">
     </header>
@@ -312,7 +309,7 @@
         </div>
     </div>
 
-    <!-- Bakir Khata -->
+    <!-- বাকির খাতা -->
     <div id="dues" class="content">
         <div id="due-form" class="card">
             <h3 class="lang" data-bn="নতুন বাকি এন্ট্রি" data-en="New Due Entry">নতুন বাকি এন্ট্রি</h3>
@@ -479,6 +476,7 @@
         }
     }
 
+    // Added Logout Function
     function logout() {
         document.getElementById('login-user').value = '';
         document.getElementById('login-pass').value = '';
@@ -590,7 +588,7 @@
 
     function saveBulkSales() {
         const rows = document.querySelectorAll('#sales-rows tr');
-        const date = getEnglishDate(); 
+        const date = getEnglishDate(); // Date in DD/MM/YYYY format for reliable monthly calculation
         const timestamp = new Date().getTime();
         rows.forEach(row => {
             const name = row.querySelector('.row-name').value;
@@ -659,6 +657,7 @@
         db.ref('dues/' + key).update({ paid: updatedPaid, due: currentTotal - updatedPaid, history: newHistory });
     }
 
+    // Added Edit Due Function
     function editDue(key, oldName, oldMobile, oldTotal, oldPaid) {
         const newName = prompt("কাস্টমারের নাম পরিবর্তন করুন:", oldName);
         if(newName === null) return; 
@@ -681,6 +680,7 @@
         }
     }
 
+    // Added Delete Due Function
     function deleteDue(key) {
         if(confirm("আপনি কি নিশ্চিত যে এই বাকির রেকর্ডটি মুছে ফেলতে চান?")) {
             db.ref('dues/' + key).remove();
@@ -690,6 +690,8 @@
 
     async function downloadPDF(tableId, fileName) {
         const element = document.getElementById(tableId);
+        
+        // This takes a snapshot of the table containing Bengali fonts
         const canvas = await html2canvas(element, { scale: 3, useCORS: true });
         const imgData = canvas.toDataURL('image/png');
         
@@ -703,6 +705,8 @@
         
         pdf.setFontSize(10);
         pdf.text("Report: " + fileName, 10, 25);
+        
+        // ** Only this date in the PDF header is specifically in English **
         pdf.text("Date: " + getEnglishDate(), 10, 30); 
         
         pdf.addImage(imgData, 'PNG', 5, 35, pdfWidth - 10, pdfHeight);
@@ -733,8 +737,13 @@
             s.forEach(child => {
                 const v = child.val();
                 if(v.date === todayStr) tS += v.price;
+                
+                // Monthly Sale Check (e.g. checks for /05/2026)
                 if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mS += v.price;
+
+                // Yearly Sale Check (e.g. checks for /2026)
                 if(v.date && v.date.endsWith(`/${curYear}`)) yS += v.price;
+                
                 historyBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty} ${v.unit || ''}</td><td>৳${v.price}</td></tr>`;
             });
             document.getElementById('today-total').innerText = "৳ " + tS;
@@ -758,6 +767,7 @@
                 if(v.date === todayStr) tB += v.cost;
                 if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mB += v.cost;
                 if(v.date && v.date.endsWith(`/${curYear}`)) yB += v.cost;
+
                 purchaseBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty} ${v.unit || ''}</td><td>৳${v.cost}</td></tr>`;
             });
             document.getElementById('rep-today-buy').innerText = "৳ " + tB;
@@ -774,11 +784,14 @@
             });
         });
 
+        // Modified Dues Render Code
         db.ref('dues').on('value', s => {
             const tbody = document.getElementById("due-list-body"); tbody.innerHTML = "";
             s.forEach(child => {
                 const d = child.val();
                 let hist = (d.history || []).map(h => `<li>${h.date}: ৳${h.amount}</li>`).join('');
+                
+                // Safe values for strings passed into inline functions
                 let safeName = (d.name || '').replace(/'/g, "\\'");
                 let safeMobile = (d.mobile || '').replace(/'/g, "\\'");
                 
