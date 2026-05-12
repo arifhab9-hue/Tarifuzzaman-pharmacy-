@@ -11,6 +11,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     
     <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -54,7 +55,7 @@
             font-weight: bold; color: var(--primary); z-index: 1001;
         }
 
-        /* Modified Logout Button Style - Positioned below lang-switch */
+        /* Logout Button Positioned below Language Switcher */
         .logout-btn {
             position: absolute; top: 55px; right: 10px; background: rgba(231, 76, 60, 0.9);
             border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;
@@ -115,8 +116,8 @@
         .btn-add { background: #6c757d; color: white; margin-top: 10px; }
         .btn-pdf { background: #e74c3c; color: white; margin-bottom: 10px; width: auto; }
         .btn-edit { background: #3498db; color: white; padding: 4px 8px; font-size: 12px; }
-        .btn-delete { background: #c0392b; color: white; padding: 4px 8px; font-size: 12px; } /* Added Delete button style */
-        .btn-warning { background: #f39c12; color: white; padding: 4px 8px; font-size: 12px; } /* Added Edit button style */
+        .btn-delete { background: #c0392b; color: white; padding: 4px 8px; font-size: 12px; } 
+        .btn-warning { background: #f39c12; color: white; padding: 4px 8px; font-size: 12px; } 
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; font-size: 13px; }
         th, td { padding: 10px; border: 1px solid #eee; text-align: left; vertical-align: top; }
@@ -164,14 +165,22 @@
     </style>
 </head>
 <body>
-
 <div id="login-overlay">
     <div class="login-box">
-        <h2 class="lang" data-bn="লগইন করুন" data-en="Login Now">লগইন করুন</h2>
-        <input type="text" id="login-user" placeholder="ইউজার নেম" class="lang-p" data-bn="ইউজার নেম" data-en="Username">
-        <input type="password" id="login-pass" placeholder="পাসওয়ার্ড" class="lang-p" data-bn="পাসওয়ার্ড" data-en="Password" style="margin-top:10px;">
-        <button class="btn btn-save lang" data-bn="প্রবেশ করুন" data-en="Login" onclick="checkLogin()" style="margin-top:15px;">প্রবেশ করুন</button>
-        <p id="login-error" style="color: red; font-size: 12px; margin-top: 10px; display: none;" class="lang" data-bn="ভুল ইউজার নেম বা পাসওয়ার্ড!" data-en="Invalid Username or Password!">ভুল ইউজার নেম বা পাসওয়ার্ড!</p>
+      <div style="font-size: 50px; color: #1e3c72; margin-bottom: 10px;">
+    <i class="fas fa-capsules"></i>
+</div>
+        <div style="margin-bottom: 12px;">
+    <input type="email" id="login-user" placeholder="আপনার ইমেইল" class="lang-p" data-bn="আপনার ইমেইল" data-en="Email Address">
+</div>
+
+<div style="margin-bottom: 15px;">
+    <input type="password" id="login-pass" placeholder="পাসওয়ার্ড" class="lang-p" data-bn="পাসওয়ার্ড" data-en="Password">
+</div>
+
+<button class="btn btn-save lang" data-bn="প্রবেশ করুন" data-en="Login" onclick="checkLogin()">
+    <i class="fas fa-sign-in-alt"></i> প্রবেশ করুন
+</button>
     </div>
 </div>
 
@@ -465,24 +474,46 @@
         document.querySelectorAll('.lang-p').forEach(el => { el.placeholder = el.getAttribute('data-' + currentLang); });
     }
 
-    function checkLogin() {
-        const user = document.getElementById('login-user').value;
-        const pass = document.getElementById('login-pass').value;
-        if(user === "Tarif" && pass === "504336") {
-            document.getElementById('login-overlay').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-        } else {
-            document.getElementById('login-error').style.display = 'block';
-        }
+   // ১. নতুন নিরাপদ লগইন ফাংশন
+function checkLogin() {
+    const email = document.getElementById('login-user').value;
+    const pass = document.getElementById('login-pass').value;
+
+    // Firebase Auth ব্যবহার করে লগইন
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+        .then(() => {
+            console.log("লগইন সফল!");
+        })
+        .catch((error) => {
+            alert("ভুল ইমেইল বা পাসওয়ার্ড!");
+        });
+}
+
+// ২. অটো-লগইন চেক (রিফ্রেশ দিলেও লগইন ধরে রাখবে)
+firebase.auth().onAuthStateChanged((user) => {
+    const loginOverlay = document.getElementById('login-overlay');
+    const mainApp = document.getElementById('main-app');
+
+    if (user) {
+        loginOverlay.style.display = 'none';
+        mainApp.style.display = 'block';
+    } else {
+        loginOverlay.style.display = 'flex';
+        mainApp.style.display = 'none';
     }
+});
+
+// ৩. নতুন নিরাপদ লগআউট ফাংশন
+function logout() {
+    if (confirm("আপনি কি নিশ্চিত যে লগআউট করতে চান?")) {
+        firebase.auth().signOut().then(() => {
+            location.reload(); 
+        });
+    }
+}
 
     // Added Logout Function
-    function logout() {
-        document.getElementById('login-user').value = '';
-        document.getElementById('login-pass').value = '';
-        document.getElementById('main-app').style.display = 'none';
-        document.getElementById('login-overlay').style.display = 'flex';
-    }
+    
 
     function showTab(id) {
         document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
