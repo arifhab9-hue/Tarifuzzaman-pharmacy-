@@ -6,47 +6,72 @@
     <title>TARIFUZZAMAN PHARMACY</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     
-    <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <!-- Html2Canvas for better rendering -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
-            --primary: #1e3c72;
-            --success: #00b09b;
-            --danger: #ff5f6d;
-            --dark: #2c3e50;
-            --header-bg: #e8f5e9; 
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --header-bg: #f1f8e9;
         }
 
-        body { font-family: 'Hind Siliguri', sans-serif; background: #f4f7f6; margin: 0; }
+        body { 
+            font-family: 'Hind Siliguri', sans-serif;
+            margin: 0; 
+            height: 100vh;
+        }
 
         #login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--primary); z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            /* ব্যাকগ্রাউন্ড পরিবর্তন করা হয়েছে */
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://i.ibb.co.com/Z6dDKS9T/tarif2.png') no-repeat center center fixed;
+            background-size: cover;
+            z-index: 9999;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
         }
+
         .login-box {
-            background: white; padding: 30px; border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 90%; max-width: 350px; text-align: center;
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(8px); 
+            padding: 35px; 
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            width: 90%; 
+            max-width: 360px; 
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .login-box h2 { margin-top: 0; color: var(--primary); }
 
-        #main-app { display: none; }
-
-        header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white; padding: 0; text-align: center; width: 100%; position: relative;
+        .pass-container {
+            position: relative;
+            margin-bottom: 12px;
         }
+
+        .pass-container i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            z-index: 10;
+        }
+
         header img { width: 100%; height: auto; display: block; }
 
         .lang-switch {
@@ -55,7 +80,6 @@
             font-weight: bold; color: var(--primary); z-index: 1001;
         }
 
-        /* Logout Button Positioned below Language Switcher */
         .logout-btn {
             position: absolute; top: 55px; right: 10px; background: rgba(231, 76, 60, 0.9);
             border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;
@@ -132,32 +156,14 @@
         .bg-sale { background: #27ae60; }
         .bg-purchase { background: #e67e22; }
 
-        /* Mobile Responsive Changes */
         @media (max-width: 600px) {
             #sales-entry-table thead { display: none; }
-            #sales-entry-table tr { 
-                display: block; 
-                border: 2px solid #eee; 
-                margin-bottom: 15px; 
-                padding: 10px; 
-                border-radius: 10px;
-                background: #fdfdfd;
-            }
-            #sales-entry-table td { 
-                display: block; 
-                width: 100% !important; 
-                padding: 5px 0; 
-                border: none; 
-            }
-            .inventory-grid {
-                grid-template-columns: 1fr !important;
-            }
-            #due-med-rows .grid {
-                grid-template-columns: 1fr !important;
-            }
+            #sales-entry-table tr { display: block; border: 2px solid #eee; margin-bottom: 15px; padding: 10px; border-radius: 10px; background: #fdfdfd; }
+            #sales-entry-table td { display: block; width: 100% !important; padding: 5px 0; border: none; }
+            .inventory-grid { grid-template-columns: 1fr !important; }
+            #due-med-rows .grid { grid-template-columns: 1fr !important; }
         }
 
-        /* Print Specific Styling */
         @media print {
             .tabs, .btn, .search-container, .lang-switch, .logout-btn { display: none !important; }
             .content { display: block !important; }
@@ -165,26 +171,26 @@
     </style>
 </head>
 <body>
+
 <div id="login-overlay">
     <div class="login-box">
-      <div style="font-size: 50px; color: #1e3c72; margin-bottom: 10px;">
-    <i class="fas fa-capsules"></i>
-</div>
+        <div style="font-size: 50px; color: #1e3c72; margin-bottom: 10px;">
+            <i class="fas fa-capsules"></i>
+        </div>
         <div style="margin-bottom: 12px;">
-    <input type="email" id="login-user" placeholder="আপনার ইমেইল" class="lang-p" data-bn="আপনার ইমেইল" data-en="Email Address">
-</div>
-
-<div style="margin-bottom: 15px;">
-    <input type="password" id="login-pass" placeholder="পাসওয়ার্ড" class="lang-p" data-bn="পাসওয়ার্ড" data-en="Password">
-</div>
-
-<button class="btn btn-save lang" data-bn="প্রবেশ করুন" data-en="Login" onclick="checkLogin()">
-    <i class="fas fa-sign-in-alt"></i> প্রবেশ করুন
-</button>
+            <input type="email" id="login-user" placeholder="আপনার ইমেইল" class="lang-p" data-bn="আপনার ইমেইল" data-en="Email Address">
+        </div>
+        <div class="pass-container">
+            <input type="password" id="login-pass" placeholder="পাসওয়ার্ড" class="lang-p" data-bn="পাসওয়ার্ড" data-en="Password">
+            <i class="fas fa-eye" id="togglePassword" onclick="togglePassVisibility()"></i>
+        </div>
+        <button class="btn btn-save lang" data-bn="প্রবেশ করুন" data-en="Login" onclick="checkLogin()">
+            <i class="fas fa-sign-in-alt"></i> প্রবেশ করুন
+        </button>
     </div>
 </div>
 
-<div id="main-app">
+<div id="main-app" style="display: none;">
     <header>
         <button class="lang-switch" onclick="toggleLanguage()">English</button>
         <button class="logout-btn" onclick="logout()">Logout</button>
@@ -203,7 +209,6 @@
         <button class="tab-btn lang" data-bn="ক্রয়-বিক্রয় রিপোর্ট" data-en="Finance Report" onclick="showTab('finance-report')">ক্রয়-বিক্রয় রিপোর্ট</button>
     </div>
 
-    <!-- Dashboard -->
     <div id="dashboard" class="content active">
         <div class="grid">
             <div class="card" style="border-left: 8px solid var(--success);">
@@ -217,7 +222,6 @@
         </div>
     </div>
 
-    <!-- Sales -->
     <div id="sales" class="content">
         <div class="card">
             <h3 class="lang" data-bn="ওষুধ বিক্রি এন্ট্রি" data-en="Sales Entry">ওষুধ বিক্রি এন্ট্রি</h3>
@@ -234,13 +238,13 @@
                 <tbody id="sales-rows"></tbody>
             </table>
             <button class="btn btn-add lang" data-bn="+ আরো ওষুধ যোগ করুন" data-en="+ Add More Medicine" onclick="addSaleRow()">+ আরো ওষুধ যোগ করুন</button>
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
+                <input type="number" id="sale-discount-pct" placeholder="পার্সেন্টেজ (%)" style="max-width: 150px;">
                 <button class="btn btn-save lang" data-bn="বিক্রি নিশ্চিত করুন" data-en="Confirm Sale" onclick="saveBulkSales()">বিক্রি নিশ্চিত করুন</button>
             </div>
         </div>
     </div>
 
-    <!-- Inventory -->
     <div id="inventory" class="content">
         <div class="card">
             <h3 class="lang" data-bn="নতুন ওষুধ স্টকে যোগ করুন" data-en="Add New Stock">নতুন ওষুধ স্টকে যোগ করুন</h3>
@@ -270,16 +274,13 @@
         </div>
     </div>
 
-    <!-- Current Stock -->
     <div id="current-stock-tab" class="content">
         <div class="card" style="overflow-x:auto;">
             <h3 class="lang" data-bn="বর্তমান স্টক রিপোর্ট" data-en="Current Stock Report">বর্তমান স্টক রিপোর্ট</h3>
-            
             <div class="search-container">
                 <i class="fa fa-search"></i>
                 <input type="text" id="stock-search" onkeyup="filterTable('stock-table', 0, 2)" placeholder="ওষুধ বা কোম্পানি খুঁজুন..." class="lang-p" data-bn="ওষুধ বা কোম্পানি খুঁজুন..." data-en="Search Medicine or Company...">
             </div>
-
             <table id="stock-table">
                 <thead><tr><th class="lang" data-bn="নাম" data-en="Name">নাম</th><th class="lang" data-bn="ধরন" data-en="Type">ধরন</th><th class="lang" data-bn="কোম্পানি" data-en="Company">কোম্পানি</th><th class="lang" data-bn="স্টক" data-en="Stock">স্টক</th><th class="lang" data-bn="একক" data-en="Unit">একক</th><th class="lang" data-bn="স্ট্যাটাস" data-en="Status">স্ট্যাটাস</th></tr></thead>
                 <tbody></tbody>
@@ -287,7 +288,6 @@
         </div>
     </div>
 
-    <!-- Med Setup -->
     <div id="med-setup" class="content">
         <div class="card">
             <h3 class="lang" data-bn="ওষুধের ধরন সেটআপ" data-en="Medicine Type Setup">ওষুধের ধরন সেটআপ</h3>
@@ -307,7 +307,6 @@
         </div>
     </div>
 
-    <!-- Data Store -->
     <div id="data-storage" class="content">
         <div class="card">
             <h3 class="lang" data-bn="তথ্য ভান্ডার (ওষুধের তালিকা)" data-en="Data Store (Medicine List)">তথ্য ভান্ডার (ওষুধের তালিকা)</h3>
@@ -318,7 +317,6 @@
         </div>
     </div>
 
-    <!-- বাকির খাতা -->
     <div id="dues" class="content">
         <div id="due-form" class="card">
             <h3 class="lang" data-bn="নতুন বাকি এন্ট্রি" data-en="New Due Entry">নতুন বাকি এন্ট্রি</h3>
@@ -359,16 +357,13 @@
         </div>
     </div>
 
-    <!-- Due Reports -->
     <div id="due-reports" class="content">
         <div class="card" style="overflow-x:auto;">
             <h3 class="lang" data-bn="বাকির বিস্তারিত রিপোর্ট" data-en="Detailed Due Report">বাকির বিস্তারিত রিপোর্ট</h3>
-            
             <div class="search-container">
                 <i class="fa fa-user-tag"></i>
                 <input type="text" id="due-search" onkeyup="filterTable('due-table', 0, 1)" placeholder="নাম বা মোবাইল নম্বর দিয়ে খুঁজুন..." class="lang-p" data-bn="নাম বা মোবাইল নম্বর দিয়ে খুঁজুন..." data-en="Search Name or Mobile...">
             </div>
-
             <button class="btn btn-pdf lang" data-bn="PDF ডাউনলোড করুন" data-en="Download PDF" onclick="downloadPDF('due-table', 'Due_Report')">PDF ডাউনলোড করুন</button>
             <table id="due-table">
                 <thead>
@@ -387,7 +382,6 @@
         </div>
     </div>
 
-    <!-- Finance Report -->
     <div id="finance-report" class="content">
         <div class="card">
             <h3 class="lang" data-bn="ক্রয় ও বিক্রয় রিপোর্ট" data-en="Finance Report">ক্রয় ও বিক্রয় রিপোর্ট</h3>
@@ -405,7 +399,6 @@
                     <p class="lang" data-bn="এই বছরের ক্রয়:" data-en="Yearly Purchase:">এই বছরের ক্রয়: <span id="rep-year-buy">৳ 0</span></p>
                 </div>
             </div>
-
             <hr>
             <h3 class="lang" data-bn="বিক্রয় রিপোর্ট (তালিকা)" data-en="Sales List">বিক্রয় রিপোর্ট (তালিকা)</h3>
             <button class="btn btn-pdf lang" data-bn="বিক্রয় PDF ডাউনলোড" data-en="Download Sales PDF" onclick="downloadPDF('sale-history-table', 'Sales_Report')">বিক্রয় PDF ডাউনলোড</button>
@@ -420,7 +413,6 @@
                 </thead>
                 <tbody id="sale-history-body"></tbody>
             </table>
-
             <br><hr>
             <h3 class="lang" data-bn="ক্রয় রিপোর্ট (তালিকা)" data-en="Purchase List">ক্রয় রিপোর্ট (তালিকা)</h3>
             <button class="btn btn-pdf lang" data-bn="ক্রয় PDF ডাউনলোড" data-en="Download Purchase PDF" onclick="downloadPDF('purchase-history-table', 'Purchase_Report')">ক্রয় PDF ডাউনলোড</button>
@@ -458,13 +450,25 @@
     let medicineMaster = {}; 
     let currentLang = 'bn';
 
-    // Helper: Get Current Date in English format (DD/MM/YYYY)
     function getEnglishDate() {
         const d = new Date();
         const day = String(d.getDate()).padStart(2, '0');
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const year = d.getFullYear();
         return `${day}/${month}/${year}`;
+    }
+
+    // পাসওয়ার্ড দেখার ফাংশন (চোখের আইকন)
+    function togglePassVisibility() {
+        const passInput = document.getElementById('login-pass');
+        const toggleIcon = document.getElementById('togglePassword');
+        if (passInput.type === 'password') {
+            passInput.type = 'text';
+            toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passInput.type = 'password';
+            toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
     }
 
     function toggleLanguage() {
@@ -474,46 +478,31 @@
         document.querySelectorAll('.lang-p').forEach(el => { el.placeholder = el.getAttribute('data-' + currentLang); });
     }
 
-   // ১. নতুন নিরাপদ লগইন ফাংশন
-function checkLogin() {
-    const email = document.getElementById('login-user').value;
-    const pass = document.getElementById('login-pass').value;
-
-    // Firebase Auth ব্যবহার করে লগইন
-    firebase.auth().signInWithEmailAndPassword(email, pass)
-        .then(() => {
-            console.log("লগইন সফল!");
-        })
-        .catch((error) => {
-            alert("ভুল ইমেইল বা পাসওয়ার্ড!");
-        });
-}
-
-// ২. অটো-লগইন চেক (রিফ্রেশ দিলেও লগইন ধরে রাখবে)
-firebase.auth().onAuthStateChanged((user) => {
-    const loginOverlay = document.getElementById('login-overlay');
-    const mainApp = document.getElementById('main-app');
-
-    if (user) {
-        loginOverlay.style.display = 'none';
-        mainApp.style.display = 'block';
-    } else {
-        loginOverlay.style.display = 'flex';
-        mainApp.style.display = 'none';
+    function checkLogin() {
+        const email = document.getElementById('login-user').value;
+        const pass = document.getElementById('login-pass').value;
+        firebase.auth().signInWithEmailAndPassword(email, pass)
+            .catch((error) => { alert("ভুল ইমেইল বা পাসওয়ার্ড!"); });
     }
-});
 
-// ৩. নতুন নিরাপদ লগআউট ফাংশন
-function logout() {
-    if (confirm("আপনি কি নিশ্চিত যে লগআউট করতে চান?")) {
-        firebase.auth().signOut().then(() => {
-            location.reload(); 
-        });
+    firebase.auth().onAuthStateChanged((user) => {
+        const loginOverlay = document.getElementById('login-overlay');
+        const mainApp = document.getElementById('main-app');
+        if (user) {
+            loginOverlay.style.display = 'none';
+            mainApp.style.display = 'block';
+            syncAll();
+        } else {
+            loginOverlay.style.display = 'flex';
+            mainApp.style.display = 'none';
+        }
+    });
+
+    function logout() {
+        if (confirm("আপনি কি নিশ্চিত যে লগআউট করতে চান?")) {
+            firebase.auth().signOut().then(() => { location.reload(); });
+        }
     }
-}
-
-    // Added Logout Function
-    
 
     function showTab(id) {
         document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
@@ -526,7 +515,6 @@ function logout() {
         let input = event.target.value.toLowerCase();
         let table = document.getElementById(tableId);
         let tr = table.getElementsByTagName("tr");
-
         for (let i = 1; i < tr.length; i++) {
             let td1 = tr[i].getElementsByTagName("td")[col1];
             let td2 = tr[i].getElementsByTagName("td")[col2];
@@ -562,11 +550,8 @@ function logout() {
             </select></td>
             <td><input type="number" class="row-qty" placeholder="পরিমাণ" value="1"></td>
             <td><select class="row-unit">
-                <option value="Pcs">Pcs</option>
-                <option value="পাতা/ Strip">পাতা/ Strip</option>
-                <option value="mLt">mLt</option>
-                <option value="Ltr">Ltr</option>
-                <option value="Box">Box</option>
+                <option value="Pcs">Pcs</option><option value="পাতা/ Strip">পাতা/ Strip</option>
+                <option value="mLt">mLt</option><option value="Ltr">Ltr</option><option value="Box">Box</option>
             </select></td>
             <td><input type="number" class="row-price" placeholder="দাম (৳)" step="any"></td>
         `;
@@ -582,11 +567,8 @@ function logout() {
             <input type="text" class="dm-name" placeholder="ওষুধের নাম" list="med-list">
             <input type="number" class="dm-qty" placeholder="Qty">
             <select class="dm-unit">
-                <option value="Pcs">Pcs</option>
-                <option value="পাতা/ Strip">পাতা/ Strip</option>
-                <option value="mLt">mLt</option>
-                <option value="Ltr">Ltr</option>
-                <option value="Box">Box</option>
+                <option value="Pcs">Pcs</option><option value="পাতা/ Strip">পাতা/ Strip</option>
+                <option value="mLt">mLt</option><option value="Ltr">Ltr</option><option value="Box">Box</option>
             </select>
             <select class="dm-type">
                 <option value="Tablet">Tablet</option><option value="Capsul">Capsul</option>
@@ -619,15 +601,22 @@ function logout() {
 
     function saveBulkSales() {
         const rows = document.querySelectorAll('#sales-rows tr');
-        const date = getEnglishDate(); // Date in DD/MM/YYYY format for reliable monthly calculation
-        const timestamp = new Date().getTime();
+        const date = getEnglishDate();
+        const discountPct = parseFloat(document.getElementById('sale-discount-pct').value) || 0;
+
         rows.forEach(row => {
             const name = row.querySelector('.row-name').value;
-            const price = parseFloat(row.querySelector('.row-price').value);
+            let price = parseFloat(row.querySelector('.row-price').value);
             const qty = parseInt(row.querySelector('.row-qty').value);
             const unit = row.querySelector('.row-unit').value;
+
             if(name && !isNaN(price)) { 
-                db.ref('sales').push({ name, price, qty, unit, date, timestamp }); 
+                // পার্সেন্টেজ অনুযায়ী দাম সমন্বয় (যদি প্রয়োজন হয় logic যোগ করা যাবে)
+                if(discountPct > 0) {
+                    price = price - (price * discountPct / 100);
+                }
+
+                db.ref('sales').push({ name, price, qty, unit, date, timestamp: Date.now() }); 
                 db.ref('inventory/' + name).once('value', s => {
                     if(s.exists()){
                         let newStock = s.val().stock - qty;
@@ -637,6 +626,7 @@ function logout() {
             }
         });
         alert("বিক্রি সফল হয়েছে!");
+        document.getElementById('sale-discount-pct').value = "";
         document.getElementById('sales-rows').innerHTML = ""; addSaleRow();
     }
 
@@ -646,14 +636,11 @@ function logout() {
         const qty = parseInt(document.getElementById('p-qty').value);
         const cost = parseFloat(document.getElementById('p-cost').value) || 0;
         const unit = document.getElementById('p-qnty-unit').value;
-        const date = getEnglishDate();
         if(!name || isNaN(qty)) return;
-        db.ref('purchases').push({ name, qty, unit, cost, date, timestamp: new Date().getTime() });
+        db.ref('purchases').push({ name, qty, unit, cost, date: getEnglishDate(), timestamp: Date.now() });
         db.ref('inventory/' + name).once('value', s => {
             let current = s.exists() ? (s.val().stock || 0) : 0;
-            db.ref('inventory/' + name).set({ 
-                stock: current + qty, type, company: document.getElementById('p-company').value, unit: unit 
-            });
+            db.ref('inventory/' + name).set({ stock: current + qty, type, company: document.getElementById('p-company').value, unit: unit });
         });
         alert("স্টক আপডেট হয়েছে");
     }
@@ -688,30 +675,20 @@ function logout() {
         db.ref('dues/' + key).update({ paid: updatedPaid, due: currentTotal - updatedPaid, history: newHistory });
     }
 
-    // Added Edit Due Function
     function editDue(key, oldName, oldMobile, oldTotal, oldPaid) {
         const newName = prompt("কাস্টমারের নাম পরিবর্তন করুন:", oldName);
         if(newName === null) return; 
-        const newMobile = prompt("মোবাইল নম্বর পরিবর্তন করুন:", oldMobile);
+        const newMobile = prompt("মোাবাইল নম্বর পরিবর্তন করুন:", oldMobile);
         const newTotal = prompt("মোট টাকা পরিবর্তন করুন (৳):", oldTotal);
-        
         if(newName !== null && newTotal !== null) {
             const parsedTotal = parseFloat(newTotal);
             if(!isNaN(parsedTotal)) {
-                db.ref('dues/' + key).update({
-                    name: newName,
-                    mobile: newMobile || "",
-                    total: parsedTotal,
-                    due: parsedTotal - oldPaid
-                });
+                db.ref('dues/' + key).update({ name: newName, mobile: newMobile || "", total: parsedTotal, due: parsedTotal - oldPaid });
                 alert("রেকর্ড আপডেট করা হয়েছে!");
-            } else {
-                alert("ভুল টাকার পরিমাণ!");
             }
         }
     }
 
-    // Added Delete Due Function
     function deleteDue(key) {
         if(confirm("আপনি কি নিশ্চিত যে এই বাকির রেকর্ডটি মুছে ফেলতে চান?")) {
             db.ref('dues/' + key).remove();
@@ -721,26 +698,17 @@ function logout() {
 
     async function downloadPDF(tableId, fileName) {
         const element = document.getElementById(tableId);
-        
-        // This takes a snapshot of the table containing Bengali fonts
         const canvas = await html2canvas(element, { scale: 3, useCORS: true });
         const imgData = canvas.toDataURL('image/png');
-        
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        
         pdf.setFontSize(16);
         pdf.text("TARIFUZZAMAN PHARMACY", pdfWidth / 2, 15, { align: 'center' });
-        
         pdf.setFontSize(10);
-        pdf.text("Report: " + fileName, 10, 25);
-        
-        // ** Only this date in the PDF header is specifically in English **
-        pdf.text("Date: " + getEnglishDate(), 10, 30); 
-        
-        pdf.addImage(imgData, 'PNG', 5, 35, pdfWidth - 10, pdfHeight);
+        pdf.text("Report: " + fileName + " | Date: " + getEnglishDate(), 10, 25);
+        pdf.addImage(imgData, 'PNG', 5, 30, pdfWidth - 10, pdfHeight);
         pdf.save(fileName + "_" + getEnglishDate() + ".pdf");
     }
 
@@ -762,19 +730,13 @@ function logout() {
             const curMonth = (now.getMonth() + 1).toString().padStart(2, '0');
             const curYear = now.getFullYear();
             const todayStr = getEnglishDate();
-
             const historyBody = document.getElementById('sale-history-body');
             historyBody.innerHTML = "";
             s.forEach(child => {
                 const v = child.val();
                 if(v.date === todayStr) tS += v.price;
-                
-                // Monthly Sale Check (e.g. checks for /05/2026)
                 if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mS += v.price;
-
-                // Yearly Sale Check (e.g. checks for /2026)
                 if(v.date && v.date.endsWith(`/${curYear}`)) yS += v.price;
-                
                 historyBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty} ${v.unit || ''}</td><td>৳${v.price}</td></tr>`;
             });
             document.getElementById('today-total').innerText = "৳ " + tS;
@@ -790,7 +752,6 @@ function logout() {
             const curMonth = (now.getMonth() + 1).toString().padStart(2, '0');
             const curYear = now.getFullYear();
             const todayStr = getEnglishDate();
-
             const purchaseBody = document.getElementById('purchase-history-body');
             purchaseBody.innerHTML = "";
             s.forEach(child => {
@@ -798,7 +759,6 @@ function logout() {
                 if(v.date === todayStr) tB += v.cost;
                 if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mB += v.cost;
                 if(v.date && v.date.endsWith(`/${curYear}`)) yB += v.cost;
-
                 purchaseBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty} ${v.unit || ''}</td><td>৳${v.cost}</td></tr>`;
             });
             document.getElementById('rep-today-buy').innerText = "৳ " + tB;
@@ -815,17 +775,13 @@ function logout() {
             });
         });
 
-        // Modified Dues Render Code
         db.ref('dues').on('value', s => {
             const tbody = document.getElementById("due-list-body"); tbody.innerHTML = "";
             s.forEach(child => {
                 const d = child.val();
                 let hist = (d.history || []).map(h => `<li>${h.date}: ৳${h.amount}</li>`).join('');
-                
-                // Safe values for strings passed into inline functions
                 let safeName = (d.name || '').replace(/'/g, "\\'");
                 let safeMobile = (d.mobile || '').replace(/'/g, "\\'");
-                
                 tbody.innerHTML += `<tr>
                     <td><b>${d.name}</b><br><small>${d.date}</small></td>
                     <td>${d.address || ''}<br>${d.mobile || ''}</td>
@@ -835,8 +791,8 @@ function logout() {
                     <td style="color:red; font-weight:bold">৳${d.due}</td>
                     <td style="display:flex; flex-direction:column; gap:5px;">
                         <button class="btn btn-save" style="padding:5px; font-size:11px;" onclick="updateDuePayment('${child.key}', ${d.paid}, ${d.total}, ${JSON.stringify(d.history || []).replace(/"/g, '&quot;')})">জমা নিন</button>
-                        <button class="btn btn-warning" style="padding:5px; font-size:11px;" onclick="editDue('${child.key}', '${safeName}', '${safeMobile}', ${d.total}, ${d.paid})">এডিট (Edit)</button>
-                        <button class="btn btn-delete" style="padding:5px; font-size:11px;" onclick="deleteDue('${child.key}')">ডিলিট (Delete)</button>
+                        <button class="btn btn-warning" style="padding:5px; font-size:11px;" onclick="editDue('${child.key}', '${safeName}', '${safeMobile}', ${d.total}, ${d.paid})">এডিট</button>
+                        <button class="btn btn-delete" style="padding:5px; font-size:11px;" onclick="deleteDue('${child.key}')">ডিলিট</button>
                     </td>
                 </tr>`;
             });
@@ -844,7 +800,6 @@ function logout() {
     }
 
     addSaleRow();
-    syncAll();
 </script>
 </body>
 </html>
