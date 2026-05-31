@@ -11,7 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -36,7 +36,6 @@
             left: 0; 
             width: 100%; 
             height: 100%;
-            /* ব্যাকগ্রাউন্ড পরিবর্তন করা হয়েছে */
             background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://i.ibb.co.com/Z6dDKS9T/tarif2.png') no-repeat center center fixed;
             background-size: cover;
             z-index: 9999;
@@ -99,6 +98,8 @@
         .tab-btn:nth-child(7) { background: #c0392b; } 
         .tab-btn:nth-child(8) { background: #16a085; } 
         .tab-btn:nth-child(9) { background: #444; }    
+        .tab-btn:nth-child(10) { background: #2980b9; }    
+        .tab-btn:nth-child(11) { background: #e67e22; }    
 
         .tab-btn.active { border-bottom: 4px solid #fff; opacity: 0.8; transform: scale(1.02); }
 
@@ -155,6 +156,7 @@
         .report-card { padding: 15px; border-radius: 8px; color: white; }
         .bg-sale { background: #27ae60; }
         .bg-purchase { background: #e67e22; }
+        .med-list-ul { margin:0; padding-left:15px; line-height: 1.6; }
 
         @media (max-width: 600px) {
             #sales-entry-table thead { display: none; }
@@ -207,6 +209,8 @@
         <button class="tab-btn lang" data-bn="বাকির খাতা" data-en="Dues Book" onclick="showTab('dues')">বাকির খাতা</button>
         <button class="tab-btn lang" data-bn="বাকির রিপোর্ট" data-en="Due Reports" onclick="showTab('due-reports')">বাকির রিপোর্ট</button>
         <button class="tab-btn lang" data-bn="ক্রয়-বিক্রয় রিপোর্ট" data-en="Finance Report" onclick="showTab('finance-report')">ক্রয়-বিক্রয় রিপোর্ট</button>
+        <button class="tab-btn lang" data-bn="ওষুধ বিক্রির তথ্য" data-en="Today Sales" onclick="showTab('today-sales-tab')">ওষুধ বিক্রির তথ্য</button>
+        <button class="tab-btn lang" data-bn="ওষুধ ক্রয়" data-en="Med Purchase" onclick="showTab('med-purchase-tab')">ওষুধ ক্রয়</button>
     </div>
 
     <div id="dashboard" class="content active">
@@ -228,11 +232,11 @@
             <table id="sales-entry-table">
                 <thead>
                     <tr>
-                        <th style="width: 30%;" class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th>
-                        <th style="width: 20%;" class="lang" data-bn="ধরন" data-en="Type">ধরন</th>
-                        <th class="lang" data-bn="পরিমাণ" data-en="Qty">পরিমাণ</th>
-                        <th class="lang" data-bn="একক" data-en="Unit">একক</th>
-                        <th class="lang" data-bn="দাম" data-en="Price">দাম</th>
+                        <th style="width: 25%;" class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th>
+                        <th style="width: 15%;" class="lang" data-bn="ধরন" data-en="Type">ধরন</th>
+                        <th style="width: 15%;" class="lang" data-bn="পরিমাণ" data-en="Qty">পরিমাণ</th>
+                        <th style="width: 30%;" class="lang" data-bn="একক ও প্যাক বিবরণ" data-en="Unit & Pack Details">একক ও প্যাক বিবরণ</th>
+                        <th style="width: 15%;" class="lang" data-bn="দাম" data-en="Price">দাম</th>
                     </tr>
                 </thead>
                 <tbody id="sales-rows"></tbody>
@@ -248,28 +252,38 @@
     <div id="inventory" class="content">
         <div class="card">
             <h3 class="lang" data-bn="নতুন ওষুধ স্টকে যোগ করুন" data-en="Add New Stock">নতুন ওষুধ স্টকে যোগ করুন</h3>
-            <div class="grid inventory-grid" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;">
-                <input type="text" id="p-name" placeholder="ওষুধের নাম" class="lang-p" data-bn="ওষুধের নাম" data-en="Medicine Name" list="med-list">
-                <select id="p-type">
-                    <option value="Tablet">Tablet</option>
-                    <option value="Capsul">Capsul</option>
-                    <option value="Syrup">Syrup</option>
-                    <option value="Injection">Injection</option>
-                    <option value="Drop">Drop</option>
-                    <option value="Ointment/ Cream">Ointment/ Cream</option>
-                    <option value="Powder">Powder</option>
-                </select>
-                <input type="text" id="p-company" placeholder="কোম্পানি" class="lang-p" data-bn="কোম্পানি" data-en="Company">
-                <input type="number" id="p-qty" placeholder="পরিমাণ">
-                <select id="p-qnty-unit">
-                    <option value="Pcs">Pcs</option>
-                    <option value="পাতা/ Strip">পাতা/ Strip</option>
-                    <option value="mLt">mLt</option>
-                    <option value="Ltr">Ltr</option>
-                    <option value="Box">Box</option>
-                </select>
-                <input type="number" id="p-cost" placeholder="কেনা দাম" class="lang-p" data-bn="কেনা দাম" data-en="Cost Price">
+            <div id="purchase-container">
+                <div class="grid inventory-grid p-row" style="grid-template-columns: 2fr 1.2fr 1.2fr 1fr 1fr 1fr 1fr 1fr;">
+                    <input type="text" class="p-name lang-p" placeholder="ওষুধের নাম" data-bn="ওষুধের নাম" data-en="Medicine Name" list="med-list">
+                    <select class="p-type">
+                        <option value="Tablet">Tablet</option>
+                        <option value="Capsul">Capsul</option>
+                        <option value="Syrup">Syrup</option>
+                        <option value="Syrup ( Liqued)">Syrup ( Liqued)</option>
+                        <option value="Injection">Injection</option>
+                        <option value="Injection( Vaccine)">Injection( Vaccine)</option>
+                        <option value="Drop">Drop</option>
+                        <option value="Ointment/ Cream">Ointment/ Cream</option>
+                        <option value="Powder">Powder</option>
+                        <option value="GM">GM</option>
+                    </select>
+                    <input type="text" class="p-company lang-p" placeholder="কোম্পানি" data-bn="কোম্পানি" data-en="Company">
+                    <input type="number" class="p-qty" placeholder="পরিমাণ" style="width: 100%;">
+                    <select class="p-qnty-unit">
+                        <option value="Pcs">Pcs</option>
+                        <option value="পাতা/ Strip">পাতা/ Strip</option>
+                        <option value="Box">Box</option>
+                    </select>
+                    <input type="number" class="p-pack-size" placeholder="Pack size">
+                    <select class="p-pack-unit">
+                        <option value="mL">mL</option>
+                        <option value="Ltr">Ltr</option>
+                        <option value="GM">GM</option>
+                    </select>
+                    <input type="number" class="p-cost lang-p" placeholder="কেনা দাম" data-bn="কেনা দাম" data-en="Cost Price">
+                </div>
             </div>
+            <button class="btn btn-add lang" data-bn="+ আরও ওষুধ যোগ করুন" data-en="+ Add More Medicine" onclick="addPurchaseRow()" style="margin-bottom: 10px;">+ আরও ওষুধ যোগ করুন</button>
             <button class="btn btn-save lang" data-bn="স্টক আপডেট করুন" data-en="Update Stock" onclick="addPurchase()">স্টক আপডেট করুন</button>
         </div>
     </div>
@@ -282,7 +296,15 @@
                 <input type="text" id="stock-search" onkeyup="filterTable('stock-table', 0, 2)" placeholder="ওষুধ বা কোম্পানি খুঁজুন..." class="lang-p" data-bn="ওষুধ বা কোম্পানি খুঁজুন..." data-en="Search Medicine or Company...">
             </div>
             <table id="stock-table">
-                <thead><tr><th class="lang" data-bn="নাম" data-en="Name">নাম</th><th class="lang" data-bn="ধরন" data-en="Type">ধরন</th><th class="lang" data-bn="কোম্পানি" data-en="Company">কোম্পানি</th><th class="lang" data-bn="স্টক" data-en="Stock">স্টক</th><th class="lang" data-bn="একক" data-en="Unit">একক</th><th class="lang" data-bn="স্ট্যাটাস" data-en="Status">স্ট্যাটাস</th></tr></thead>
+                <thead><tr>
+                    <th class="lang" data-bn="নাম" data-en="Name">নাম</th>
+                    <th class="lang" data-bn="ধরন" data-en="Type">ধরন</th>
+                    <th class="lang" data-bn="কোম্পানি" data-en="Company">কোম্পানি</th>
+                    <th class="lang" data-bn="স্টক" data-en="Stock">স্টক</th>
+                    <th class="lang" data-bn="একক বিবরণ" data-en="Unit Details">একক বিবরণ</th>
+                    <th class="lang" data-bn="প্যাক সাইজ" data-en="Pack Size">প্যাক সাইজ</th>
+                    <th class="lang" data-bn="স্ট্যাটাস" data-en="Status">স্ট্যাটাস</th>
+                </tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -297,10 +319,13 @@
                     <option value="Tablet">Tablet</option>
                     <option value="Capsul">Capsul</option>
                     <option value="Syrup">Syrup</option>
+                    <option value="Syrup ( Liqued)">Syrup ( Liqued)</option>
                     <option value="Injection">Injection</option>
+                    <option value="Injection( Vaccine)">Injection( Vaccine)</option>
                     <option value="Drop">Drop</option>
                     <option value="Ointment/ Cream">Ointment/ Cream</option>
                     <option value="Powder">Powder</option>
+                    <option value="GM">GM</option>
                 </select>
                 <button class="btn btn-save lang" data-bn="সেভ করুন" data-en="Save Now" onclick="saveMedSetup()">সেভ করুন</button>
             </div>
@@ -325,26 +350,38 @@
                 <input type="text" id="d-mobile" placeholder="মোবাইল নম্বর" class="lang-p" data-bn="মোবাইল নম্বর" data-en="Mobile No">
                 <input type="text" id="d-village" placeholder="গ্রাম" class="lang-p" data-bn="গ্রাম" data-en="Village">
                 <input type="text" id="d-union" placeholder="ইউনিয়ন" class="lang-p" data-bn="ইউনিয়ন" data-en="Union">
+                <input type="file" id="d-picture" accept="image/*" style="padding:7px; background:#f8f9fa;">
             </div>
             <div id="due-med-rows">
-                <div class="grid" style="grid-template-columns: 2fr 0.8fr 0.8fr 1.2fr 1fr;">
+                <div class="grid" style="grid-template-columns: 2fr 0.6fr 1.2fr 1.2fr;">
                     <input type="text" class="dm-name lang-p" placeholder="ওষুধের নাম" data-bn="ওষুধের নাম" data-en="Medicine Name" list="med-list">
-                    <input type="number" class="dm-qty" placeholder="Qty">
-                    <select class="dm-unit">
-                        <option value="Pcs">Pcs</option>
-                        <option value="পাতা/ Strip">পাতা/ Strip</option>
-                        <option value="mLt">mLt</option>
-                        <option value="Ltr">Ltr</option>
-                        <option value="Box">Box</option>
-                    </select>
+                    <input type="number" class="dm-qty" placeholder="Qty" style="width: 100%;">
+                    <div>
+                        <select class="dm-unit" style="margin-bottom: 4px;">
+                            <option value="Pcs">Pcs</option>
+                            <option value="পাতা/ Strip">পাতা/ Strip</option>
+                            <option value="Box">Box</option>
+                        </select>
+                        <div style="display: flex; gap: 4px;">
+                            <input type="number" class="dm-pack-size" placeholder="Pack size" style="width: 50%;">
+                            <select class="dm-pack-unit" style="width: 50%;">
+                                <option value="mL">mL</option>
+                                <option value="Ltr">Ltr</option>
+                                <option value="GM">GM</option>
+                            </select>
+                        </div>
+                    </div>
                     <select class="dm-type">
                         <option value="Tablet">Tablet</option>
                         <option value="Capsul">Capsul</option>
                         <option value="Syrup">Syrup</option>
+                        <option value="Syrup ( Liqued)">Syrup ( Liqued)</option>
                         <option value="Injection">Injection</option>
+                        <option value="Injection( Vaccine)">Injection( Vaccine)</option>
                         <option value="Drop">Drop</option>
                         <option value="Ointment/ Cream">Ointment/ Cream</option>
                         <option value="Powder">Powder</option>
+                        <option value="GM">GM</option>
                     </select>
                 </div>
             </div>
@@ -429,6 +466,35 @@
             </table>
         </div>
     </div>
+
+    <div id="today-sales-tab" class="content">
+        <div class="card">
+            <h3 class="lang" data-bn="ওষুধ বিক্রির তথ্য বিস্তারিত" data-en="Today's Sales Details">ওষুধ বিক্রির তথ্য বিস্তারিত</h3>
+            <div class="search-container">
+                <i class="fa fa-search"></i>
+                <input type="text" id="today-sales-search" onkeyup="filterTable('today-sales-table', 0, 2)" placeholder="খুঁজুন...">
+            </div>
+            <button class="btn btn-pdf lang" data-bn="আজকের বিক্রয় PDF ডাউনলোড" data-en="Download Today's Sales PDF" onclick="downloadPDF('today-sales-table', 'Today_Sales_Detailed')">আজকের বিক্রয় PDF ডাউনলোড</button>
+            <table id="today-sales-table">
+                <tbody id="today-sales-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="med-purchase-tab" class="content">
+        <div class="card">
+            <h3 class="lang" data-bn="ওষুধ ক্রয় রিপোর্ট (বিস্তারিত)" data-en="Medicine Purchase Detailed Report">ওষুধ ক্রয় রিপোর্ট (বিস্তারিত)</h3>
+            <div class="search-container">
+                <i class="fa fa-search"></i>
+                <input type="text" id="med-purchase-search" onkeyup="filterTable('med-purchase-table', 0, 2)" placeholder="খুঁজুন...">
+            </div>
+            <button class="btn btn-pdf lang" data-bn="ক্রয় PDF ডাউনলোড" data-en="Download Purchase PDF" onclick="downloadPDF('med-purchase-table', 'Detailed_Purchase_Report')">ক্রয় PDF ডাউনলোড</button>
+            <table id="med-purchase-table">
+                <tbody id="med-purchase-body"></tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 <datalist id="med-list"></datalist>
@@ -446,6 +512,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const storage = firebase.storage(); // Initialized Storage
 
     let medicineMaster = {}; 
     let currentLang = 'bn';
@@ -458,7 +525,6 @@
         return `${day}/${month}/${year}`;
     }
 
-    // পাসওয়ার্ড দেখার ফাংশন (চোখের আইকন)
     function togglePassVisibility() {
         const passInput = document.getElementById('login-pass');
         const toggleIcon = document.getElementById('togglePassword');
@@ -544,37 +610,92 @@
             <td><input type="text" class="row-name" placeholder="ওষুধের নাম" list="med-list" oninput="autoFillType(this)"></td>
             <td><select class="row-type">
                 <option value="Tablet">Tablet</option><option value="Capsul">Capsul</option>
-                <option value="Syrup">Syrup</option><option value="Injection">Injection</option>
-                <option value="Drop">Drop</option><option value="Ointment/ Cream">Ointment/ Cream</option>
-                <option value="Powder">Powder</option>
+                <option value="Syrup">Syrup</option><option value="Syrup ( Liqued)">Syrup ( Liqued)</option>
+                <option value="Injection">Injection</option><option value="Injection( Vaccine)">Injection( Vaccine)</option><option value="Drop">Drop</option>
+                <option value="Ointment/ Cream">Ointment/ Cream</option><option value="Powder">Powder</option>
+                <option value="GM">GM</option>
             </select></td>
-            <td><input type="number" class="row-qty" placeholder="পরিমাণ" value="1"></td>
-            <td><select class="row-unit">
-                <option value="Pcs">Pcs</option><option value="পাতা/ Strip">পাতা/ Strip</option>
-                <option value="mLt">mLt</option><option value="Ltr">Ltr</option><option value="Box">Box</option>
-            </select></td>
+            <td><input type="number" class="row-qty" placeholder="পরিমাণ" value="1" style="width: 100%;"></td>
+            <td>
+                <select class="row-unit" style="margin-bottom: 4px;">
+                    <option value="Pcs">Pcs</option><option value="পাতা/ Strip">পাতা/ Strip</option>
+                    <option value="Box">Box</option>
+                </select>
+                <div style="display: flex; gap: 4px;">
+                    <input type="number" class="row-pack-size" placeholder="Pack size" style="width: 50%;">
+                    <select class="row-pack-unit" style="width: 50%;">
+                        <option value="mL">mL</option><option value="Ltr">Ltr</option><option value="GM">GM</option>
+                    </select>
+                </div>
+            </td>
             <td><input type="number" class="row-price" placeholder="দাম (৳)" step="any"></td>
         `;
         tbody.appendChild(row);
+    }
+
+    function addPurchaseRow() {
+        const container = document.getElementById('purchase-container');
+        const div = document.createElement('div');
+        div.className = "grid inventory-grid p-row";
+        div.style.gridTemplateColumns = "2fr 1.2fr 1.2fr 1fr 1fr 1fr 1fr 1fr";
+        div.innerHTML = `
+            <input type="text" class="p-name lang-p" placeholder="ওষুধের নাম" data-bn="ওষুধের নাম" data-en="Medicine Name" list="med-list">
+            <select class="p-type">
+                <option value="Tablet">Tablet</option>
+                <option value="Capsul">Capsul</option>
+                <option value="Syrup">Syrup</option>
+                <option value="Syrup ( Liqued)">Syrup ( Liqued)</option>
+                <option value="Injection">Injection</option>
+                <option value="Injection( Vaccine)">Injection( Vaccine)</option>
+                <option value="Drop">Drop</option>
+                <option value="Ointment/ Cream">Ointment/ Cream</option>
+                <option value="Powder">Powder</option>
+                <option value="GM">GM</option>
+            </select>
+            <input type="text" class="p-company lang-p" placeholder="কোম্পানি" data-bn="কোম্পানি" data-en="Company">
+            <input type="number" class="p-qty" placeholder="পরিমাণ" style="width: 100%;">
+            <select class="p-qnty-unit">
+                <option value="Pcs">Pcs</option>
+                <option value="পাতা/ Strip">পাতা/ Strip</option>
+                <option value="Box">Box</option>
+            </select>
+            <input type="number" class="p-pack-size" placeholder="Pack size">
+            <select class="p-pack-unit">
+                <option value="mL">mL</option>
+                <option value="Ltr">Ltr</option>
+                <option value="GM">GM</option>
+            </select>
+            <input type="number" class="p-cost lang-p" placeholder="কেনা দাম" data-bn="কেনা দাম" data-en="Cost Price">
+        `;
+        container.appendChild(div);
     }
 
     function addDueMedRow() {
         const container = document.getElementById('due-med-rows');
         const div = document.createElement('div');
         div.className = "grid";
-        div.style.gridTemplateColumns = "2fr 0.8fr 0.8fr 1.2fr 1fr";
+        div.style.gridTemplateColumns = "2fr 0.6fr 1.2fr 1.2fr";
         div.innerHTML = `
             <input type="text" class="dm-name" placeholder="ওষুধের নাম" list="med-list">
-            <input type="number" class="dm-qty" placeholder="Qty">
-            <select class="dm-unit">
-                <option value="Pcs">Pcs</option><option value="পাতা/ Strip">পাতা/ Strip</option>
-                <option value="mLt">mLt</option><option value="Ltr">Ltr</option><option value="Box">Box</option>
-            </select>
+            <input type="number" class="dm-qty" placeholder="Qty" style="width: 100%;">
+            <div>
+                <select class="dm-unit" style="margin-bottom: 4px;">
+                    <option value="Pcs">Pcs</option><option value="পাতা/ Strip">পাতা/ Strip</option>
+                    <option value="Box">Box</option>
+                </select>
+                <div style="display: flex; gap: 4px;">
+                    <input type="number" class="dm-pack-size" placeholder="Pack size" style="width: 50%;">
+                    <select class="dm-pack-unit" style="width: 50%;">
+                        <option value="mL">mL</option><option value="Ltr">Ltr</option><option value="GM">GM</option>
+                    </select>
+                </div>
+            </div>
             <select class="dm-type">
                 <option value="Tablet">Tablet</option><option value="Capsul">Capsul</option>
-                <option value="Syrup">Syrup</option><option value="Injection">Injection</option>
-                <option value="Drop">Drop</option><option value="Ointment/ Cream">Ointment/ Cream</option>
-                <option value="Powder">Powder</option>
+                <option value="Syrup">Syrup</option><option value="Syrup ( Liqued)">Syrup ( Liqued)</option>
+                <option value="Injection">Injection</option><option value="Injection( Vaccine)">Injection( Vaccine)</option><option value="Drop">Drop</option>
+                <option value="Ointment/ Cream">Ointment/ Cream</option><option value="Powder">Powder</option>
+                <option value="GM">GM</option>
             </select>
         `;
         container.appendChild(div);
@@ -584,6 +705,12 @@
         const name = document.getElementById('setup-name').value;
         const type = document.getElementById('setup-type').value;
         if(!name) return;
+        
+        if(medicineMaster[name]) {
+            alert("নোটিশ: এই ওষুধের নাম ইতিমধ্যে সেভ করা আছে!");
+            return;
+        }
+
         db.ref('medicine_master/' + name).set({ type });
         document.getElementById('setup-name').value = "";
         alert("ওষুধ ডাটাবেসে যোগ হয়েছে");
@@ -609,18 +736,35 @@
             let price = parseFloat(row.querySelector('.row-price').value);
             const qty = parseInt(row.querySelector('.row-qty').value);
             const unit = row.querySelector('.row-unit').value;
+            const packSize = row.querySelector('.row-pack-size').value || "0";
+            const packUnit = row.querySelector('.row-pack-unit').value;
 
             if(name && !isNaN(price)) { 
-                // পার্সেন্টেজ অনুযায়ী দাম সমন্বয় (যদি প্রয়োজন হয় logic যোগ করা যাবে)
                 if(discountPct > 0) {
                     price = price - (price * discountPct / 100);
                 }
 
-                db.ref('sales').push({ name, price, qty, unit, date, timestamp: Date.now() }); 
-                db.ref('inventory/' + name).once('value', s => {
+                db.ref('sales').push({ 
+                    name, price, qty, unit, 
+                    pack_size: packSize === "0" ? "" : packSize, pack_unit: packUnit, 
+                    date, timestamp: Date.now() 
+                }); 
+                
+                // Composite key for strict matching based on Unit, Pcs, Box, Strip, Pack size etc
+                let invKey = (name + "_" + unit + "_" + packSize + "_" + packUnit).replace(/[\.\#\$\/\[\]]/g, "-");
+                
+                db.ref('inventory/' + invKey).once('value', s => {
                     if(s.exists()){
                         let newStock = s.val().stock - qty;
-                        db.ref('inventory/' + name).update({ stock: newStock });
+                        db.ref('inventory/' + invKey).update({ stock: newStock });
+                    } else {
+                        // Fallback logic for backward compatibility (if stock was added previously without composite key)
+                        db.ref('inventory/' + name).once('value', oldS => {
+                            if(oldS.exists()){
+                                let newStock = oldS.val().stock - qty;
+                                db.ref('inventory/' + name).update({ stock: newStock });
+                            }
+                        });
                     }
                 });
             }
@@ -631,37 +775,89 @@
     }
 
     function addPurchase() {
-        const name = document.getElementById('p-name').value;
-        const type = document.getElementById('p-type').value;
-        const qty = parseInt(document.getElementById('p-qty').value);
-        const cost = parseFloat(document.getElementById('p-cost').value) || 0;
-        const unit = document.getElementById('p-qnty-unit').value;
-        if(!name || isNaN(qty)) return;
-        db.ref('purchases').push({ name, qty, unit, cost, date: getEnglishDate(), timestamp: Date.now() });
-        db.ref('inventory/' + name).once('value', s => {
-            let current = s.exists() ? (s.val().stock || 0) : 0;
-            db.ref('inventory/' + name).set({ stock: current + qty, type, company: document.getElementById('p-company').value, unit: unit });
+        const rows = document.querySelectorAll('.p-row');
+        let successCount = 0;
+        
+        rows.forEach(row => {
+            const name = row.querySelector('.p-name').value;
+            const type = row.querySelector('.p-type').value;
+            const company = row.querySelector('.p-company').value;
+            const qty = parseInt(row.querySelector('.p-qty').value);
+            const cost = parseFloat(row.querySelector('.p-cost').value) || 0;
+            const unit = row.querySelector('.p-qnty-unit').value;
+            const packSize = row.querySelector('.p-pack-size').value || "0";
+            const packUnit = row.querySelector('.p-pack-unit').value;
+            
+            if(!name || isNaN(qty)) return;
+            successCount++;
+            
+            db.ref('purchases').push({ 
+                name, qty, unit, pack_size: packSize === "0" ? "" : packSize, pack_unit: packUnit, 
+                cost, date: getEnglishDate(), timestamp: Date.now() 
+            });
+            
+            let invKey = (name + "_" + unit + "_" + packSize + "_" + packUnit).replace(/[\.\#\$\/\[\]]/g, "-");
+            
+            db.ref('inventory/' + invKey).once('value', s => {
+                let current = s.exists() ? (s.val().stock || 0) : 0;
+                db.ref('inventory/' + invKey).set({ 
+                    name: name,
+                    stock: current + qty, type, 
+                    company: company, 
+                    unit: unit, pack_size: packSize === "0" ? "" : packSize, pack_unit: packUnit 
+                });
+            });
         });
-        alert("স্টক আপডেট হয়েছে");
+        
+        if(successCount > 0) {
+            alert("স্টক আপডেট হয়েছে");
+            document.getElementById('purchase-container').innerHTML = '';
+            addPurchaseRow();
+        } else {
+            alert("দয়া করে ওষুধের নাম এবং পরিমাণ ঠিকভাবে দিন!");
+        }
     }
 
-    function addDue() {
+    async function addDue() {
         const name = document.getElementById('d-customer').value;
         const total = parseFloat(document.getElementById('d-total').value);
         const paid = parseFloat(document.getElementById('d-paid').value) || 0;
         const date = getEnglishDate();
         if(!name || isNaN(total)) return alert("কাস্টমারের নাম এবং মোট টাকা দিন");
+
         let medDetails = [];
         document.querySelectorAll('#due-med-rows .grid').forEach(row => {
             const mN = row.querySelector('.dm-name').value;
             const mQ = row.querySelector('.dm-qty').value;
             const mU = row.querySelector('.dm-unit').value;
-            if(mN) medDetails.push(`${mN} (${mQ} ${mU})`);
+            const mPS = row.querySelector('.dm-pack-size').value;
+            const mPU = row.querySelector('.dm-pack-unit').value;
+            if(mN) {
+                let packInfo = mPS ? ` [Pack: ${mPS} ${mPU}]` : '';
+                medDetails.push(`${mN} (${mQ} ${mU}${packInfo})`);
+            }
         });
+
+        // Image Upload Logic
+        const fileInput = document.getElementById('d-picture');
+        let imageUrl = "";
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const storageRef = firebase.storage().ref('dues_images/' + Date.now() + '_' + file.name);
+            try {
+                await storageRef.put(file);
+                imageUrl = await storageRef.getDownloadURL();
+            } catch (error) {
+                console.error("Image Upload Error:", error);
+                alert("ছবি আপলোড ব্যর্থ হয়েছে।");
+            }
+        }
+
         db.ref('dues').push({
             name, total, paid, due: total - paid, date, meds: medDetails.join(', '),
             mobile: document.getElementById('d-mobile').value,
             address: `${document.getElementById('d-village').value}, ${document.getElementById('d-union').value}`,
+            imageUrl: imageUrl, 
             history: [{date, amount: paid}]
         }).then(() => { alert("বাকির তথ্য সেভ হয়েছে"); location.reload(); });
     }
@@ -724,21 +920,95 @@
             });
         });
 
+        // === SALES SYNC (ওষুধ বিক্রির তথ্য) ===
         db.ref('sales').on('value', s => {
             let tS = 0, mS = 0, yS = 0;
             const now = new Date();
             const curMonth = (now.getMonth() + 1).toString().padStart(2, '0');
             const curYear = now.getFullYear();
             const todayStr = getEnglishDate();
+            
             const historyBody = document.getElementById('sale-history-body');
+            const todaySalesBody = document.getElementById('today-sales-body');
+            
             historyBody.innerHTML = "";
+            let groupedSales = {}; 
+
             s.forEach(child => {
                 const v = child.val();
+                let packDetails = v.pack_size ? ` [Pack: ${v.pack_size} ${v.pack_unit || ''}]` : '';
+                let fullDetails = `${v.qty} ${v.unit || ''}${packDetails}`;
+
                 if(v.date === todayStr) tS += v.price;
                 if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mS += v.price;
                 if(v.date && v.date.endsWith(`/${curYear}`)) yS += v.price;
-                historyBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty} ${v.unit || ''}</td><td>৳${v.price}</td></tr>`;
+                
+                historyBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${fullDetails}</td><td>৳${v.price}</td></tr>`;
+
+                // Grouping Data by Date and Time
+                let timeStr = new Date(v.timestamp || Date.now()).toLocaleTimeString('en-US', {hour: 'numeric', minute:'2-digit', hour12: true});
+                if(!groupedSales[v.date]) { groupedSales[v.date] = {}; }
+                if(!groupedSales[v.date][timeStr]) { groupedSales[v.date][timeStr] = { items: [], total: 0 }; }
+                
+                groupedSales[v.date][timeStr].items.push(v);
+                groupedSales[v.date][timeStr].total += v.price;
             });
+
+            // Render Today Sales Grouped View (Chronological ascending order)
+            todaySalesBody.innerHTML = "";
+            let sortedSalesDates = Object.keys(groupedSales).sort((a,b) => a.split('/').reverse().join('').localeCompare(b.split('/').reverse().join('')));
+            
+            sortedSalesDates.forEach(dateStr => {
+                let times = Object.keys(groupedSales[dateStr]).sort((a,b) => a.localeCompare(b));
+                times.forEach(timeStr => {
+                    let batch = groupedSales[dateStr][timeStr];
+
+                    todaySalesBody.innerHTML += `
+                        <tr>
+                            <td colspan="6" style="background:#2c3e50; color:white; font-weight:bold; padding:8px;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <span>Date: ${dateStr}</span>
+                                    <span>Time: ${timeStr}</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="background:#f1f8e9; font-weight:bold; color: #2e7d32;">
+                            <td>Name</td>
+                            <td>Unit</td>
+                            <td>Type of Medicine</td>
+                            <td>Pack Size</td>
+                            <td>Price</td>
+                            <td>Sub-Total</td>
+                        </tr>
+                    `;
+
+                    batch.items.forEach(item => {
+                        let type = medicineMaster[item.name] ? medicineMaster[item.name].type : '';
+                        let unitPrice = (item.price / item.qty).toFixed(2);
+                        let packStr = item.pack_size ? `${item.pack_size} ${item.pack_unit || ''}` : '-';
+
+                        todaySalesBody.innerHTML += `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.qty} ${item.unit || ''}</td>
+                                <td>${type}</td>
+                                <td>${packStr}</td>
+                                <td>${unitPrice}</td>
+                                <td>${item.price}</td>
+                            </tr>
+                        `;
+                    });
+
+                    todaySalesBody.innerHTML += `
+                        <tr>
+                            <td colspan="5" style="text-align:right; font-weight:bold; font-size:15px;">Total:</td>
+                            <td style="font-weight:bold; font-size:15px; color:#c0392b;">${batch.total.toFixed(2)}</td>
+                        </tr>
+                        <tr><td colspan="6" style="border:none; height:15px;"></td></tr>
+                    `;
+                });
+            });
+
             document.getElementById('today-total').innerText = "৳ " + tS;
             document.getElementById('month-total').innerText = "৳ " + mS;
             document.getElementById('rep-today-sale').innerText = "৳ " + tS;
@@ -746,32 +1016,118 @@
             document.getElementById('rep-year-sale').innerText = "৳ " + yS;
         });
 
+        // === PURCHASES SYNC (ওষুধ ক্রয়) ===
         db.ref('purchases').on('value', s => {
             let tB = 0, mB = 0, yB = 0;
             const now = new Date();
             const curMonth = (now.getMonth() + 1).toString().padStart(2, '0');
             const curYear = now.getFullYear();
             const todayStr = getEnglishDate();
+            
             const purchaseBody = document.getElementById('purchase-history-body');
+            const medPurchaseBody = document.getElementById('med-purchase-body');
+            
             purchaseBody.innerHTML = "";
+            let groupedPurchases = {}; 
+
             s.forEach(child => {
                 const v = child.val();
+                let packDetails = v.pack_size ? ` [Pack: ${v.pack_size} ${v.pack_unit || ''}]` : '';
+                let fullDetails = `${v.qty} ${v.unit || ''}${packDetails}`;
+
                 if(v.date === todayStr) tB += v.cost;
                 if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mB += v.cost;
                 if(v.date && v.date.endsWith(`/${curYear}`)) yB += v.cost;
-                purchaseBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${v.qty} ${v.unit || ''}</td><td>৳${v.cost}</td></tr>`;
+                
+                purchaseBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${fullDetails}</td><td>৳${v.cost}</td></tr>`;
+
+                // Grouping by Date and Time
+                let timeStr = new Date(v.timestamp || Date.now()).toLocaleTimeString('en-US', {hour: 'numeric', minute:'2-digit', hour12: true});
+                if(!groupedPurchases[v.date]) { groupedPurchases[v.date] = {}; }
+                if(!groupedPurchases[v.date][timeStr]) { groupedPurchases[v.date][timeStr] = { items: [], total: 0 }; }
+                
+                groupedPurchases[v.date][timeStr].items.push(v);
+                groupedPurchases[v.date][timeStr].total += v.cost;
             });
+
+            // Render Purchases Grouped View (Chronological ascending order)
+            medPurchaseBody.innerHTML = "";
+            let sortedPurchDates = Object.keys(groupedPurchases).sort((a,b) => a.split('/').reverse().join('').localeCompare(b.split('/').reverse().join('')));
+            
+            sortedPurchDates.forEach(dateStr => {
+                let times = Object.keys(groupedPurchases[dateStr]).sort((a,b) => a.localeCompare(b));
+                times.forEach(timeStr => {
+                    let batch = groupedPurchases[dateStr][timeStr];
+
+                    medPurchaseBody.innerHTML += `
+                        <tr>
+                            <td colspan="6" style="background:#2980b9; color:white; font-weight:bold; padding:8px;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <span>Date: ${dateStr}</span>
+                                    <span>Time: ${timeStr}</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="background:#e8f4f8; font-weight:bold; color: #2980b9;">
+                            <td>Name</td>
+                            <td>Unit</td>
+                            <td>Type of Medicine</td>
+                            <td>Pack Size</td>
+                            <td>Price</td>
+                            <td>Total</td>
+                        </tr>
+                    `;
+
+                    batch.items.forEach(item => {
+                        let type = medicineMaster[item.name] ? medicineMaster[item.name].type : '';
+                        let unitPrice = (item.cost / item.qty).toFixed(2);
+                        let packStr = item.pack_size ? `${item.pack_size} ${item.pack_unit || ''}` : '-';
+
+                        medPurchaseBody.innerHTML += `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.qty} ${item.unit || ''}</td>
+                                <td>${type}</td>
+                                <td>${packStr}</td>
+                                <td>${unitPrice}</td>
+                                <td>${item.cost}</td>
+                            </tr>
+                        `;
+                    });
+
+                    medPurchaseBody.innerHTML += `
+                        <tr>
+                            <td colspan="5" style="text-align:right; font-weight:bold; font-size:15px;">Total:</td>
+                            <td style="font-weight:bold; font-size:15px; color:#d35400;">${batch.total.toFixed(2)}</td>
+                        </tr>
+                        <tr><td colspan="6" style="border:none; height:15px;"></td></tr>
+                    `;
+                });
+            });
+
             document.getElementById('rep-today-buy').innerText = "৳ " + tB;
             document.getElementById('rep-month-buy').innerText = "৳ " + mB;
             document.getElementById('rep-year-buy').innerText = "৳ " + yB;
         });
 
+        // === INVENTORY SYNC (বর্তমান স্টক) ===
         db.ref('inventory').on('value', s => {
             const tbody = document.querySelector("#stock-table tbody"); tbody.innerHTML = "";
             s.forEach(child => {
                 const d = child.val();
+                let actualName = d.name || child.key; // Backward compatibility with older records
                 let cls = d.stock < 10 ? "class='low-stock'" : "";
-                tbody.innerHTML += `<tr><td>${child.key}</td><td>${d.type}</td><td>${d.company}</td><td ${cls}>${d.stock}</td><td>${d.unit || 'N/A'}</td><td>${d.stock < 10 ? "⚠️ কম" : "✅ পর্যাপ্ত"}</td></tr>`;
+                let packString = d.pack_size && d.pack_size !== "0" ? `${d.pack_size} ${d.pack_unit || ''}` : 'N/A';
+                
+                tbody.innerHTML += `<tr>
+                    <td>${actualName}</td>
+                    <td>${d.type || ''}</td>
+                    <td>${d.company || ''}</td>
+                    <td ${cls}>${d.stock}</td>
+                    <td>${d.unit || 'N/A'}</td>
+                    <td>${packString}</td>
+                    <td>${d.stock < 10 ? "⚠️ কম" : "✅ পর্যাপ্ত"}</td>
+                </tr>`;
             });
         });
 
@@ -782,8 +1138,12 @@
                 let hist = (d.history || []).map(h => `<li>${h.date}: ৳${h.amount}</li>`).join('');
                 let safeName = (d.name || '').replace(/'/g, "\\'");
                 let safeMobile = (d.mobile || '').replace(/'/g, "\\'");
+                
+                // Show uploaded image if exists
+                let imgHtml = d.imageUrl ? `<br><a href="${d.imageUrl}" target="_blank"><img src="${d.imageUrl}" style="width:50px; height:50px; object-fit:cover; border-radius:5px; margin-top:5px; border:1px solid #ccc;"></a>` : '';
+
                 tbody.innerHTML += `<tr>
-                    <td><b>${d.name}</b><br><small>${d.date}</small></td>
+                    <td><b>${d.name}</b><br><small>${d.date}</small>${imgHtml}</td>
                     <td>${d.address || ''}<br>${d.mobile || ''}</td>
                     <td>${d.meds || ''}</td>
                     <td>৳${d.total}</td>
