@@ -186,7 +186,7 @@
             <input type="password" id="login-pass" placeholder="পাসওয়ার্ড" class="lang-p" data-bn="পাসওয়ার্ড" data-en="Password">
             <i class="fas fa-eye" id="togglePassword" onclick="togglePassVisibility()"></i>
         </div>
-        <button class="btn btn-save lang" data-bn="প্রবেশ করুন" data-en="Login" onclick="checkLogin()">
+        <button class="btn btn-save lang" data-bn="প্রवेश করুন" data-en="Login" onclick="checkLogin()">
             <i class="fas fa-sign-in-alt"></i> প্রবেশ করুন
         </button>
     </div>
@@ -443,9 +443,7 @@
                 <thead>
                     <tr>
                         <th class="lang" data-bn="তারিখ" data-en="Date">তারিখ</th>
-                        <th class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th>
-                        <th class="lang" data-bn="পরিমাণ" data-en="Qty">পরিমাণ</th>
-                        <th class="lang" data-bn="টাকা" data-en="Amount">টাকা</th>
+                        <th class="lang" data-bn="মোট টাকা" data-en="Total Amount">মোট টাকা</th>
                     </tr>
                 </thead>
                 <tbody id="sale-history-body"></tbody>
@@ -457,9 +455,7 @@
                 <thead>
                     <tr>
                         <th class="lang" data-bn="তারিখ" data-en="Date">তারিখ</th>
-                        <th class="lang" data-bn="ওষুধের নাম" data-en="Medicine Name">ওষুধের নাম</th>
-                        <th class="lang" data-bn="পরিমাণ" data-en="Qty">পরিমাণ</th>
-                        <th class="lang" data-bn="কেনা দাম" data-en="Cost">কেনা দাম</th>
+                        <th class="lang" data-bn="মোট টাকা" data-en="Total Amount">মোট টাকা</th>
                     </tr>
                 </thead>
                 <tbody id="purchase-history-body"></tbody>
@@ -750,7 +746,6 @@
                     date, timestamp: Date.now() 
                 }); 
                 
-                // Composite key for strict matching based on Unit, Pcs, Box, Strip, Pack size etc
                 let invKey = (name + "_" + unit + "_" + packSize + "_" + packUnit).replace(/[\.\#\$\/\[\]]/g, "-");
                 
                 db.ref('inventory/' + invKey).once('value', s => {
@@ -758,7 +753,6 @@
                         let newStock = s.val().stock - qty;
                         db.ref('inventory/' + invKey).update({ stock: newStock });
                     } else {
-                        // Fallback logic for backward compatibility (if stock was added previously without composite key)
                         db.ref('inventory/' + name).once('value', oldS => {
                             if(oldS.exists()){
                                 let newStock = oldS.val().stock - qty;
@@ -838,7 +832,6 @@
             }
         });
 
-        // Image Upload Logic
         const fileInput = document.getElementById('d-picture');
         let imageUrl = "";
         if (fileInput && fileInput.files.length > 0) {
@@ -880,7 +873,7 @@
             const parsedTotal = parseFloat(newTotal);
             if(!isNaN(parsedTotal)) {
                 db.ref('dues/' + key).update({ name: newName, mobile: newMobile || "", total: parsedTotal, due: parsedTotal - oldPaid });
-                alert("রেকর্ড আপডেট করা হয়েছে!");
+                alert("রেকርድ আপডেট করা হয়েছে!");
             }
         }
     }
@@ -933,6 +926,7 @@
             
             historyBody.innerHTML = "";
             let groupedSales = {}; 
+            let salesByDate = {}; 
 
             s.forEach(child => {
                 const v = child.val();
@@ -943,9 +937,9 @@
                 if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mS += v.price;
                 if(v.date && v.date.endsWith(`/${curYear}`)) yS += v.price;
                 
-                historyBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${fullDetails}</td><td>৳${v.price}</td></tr>`;
+                if(!salesByDate[v.date]) { salesByDate[v.date] = 0; }
+                salesByDate[v.date] += v.price;
 
-                // Grouping Data by Date and Time
                 let timeStr = new Date(v.timestamp || Date.now()).toLocaleTimeString('en-US', {hour: 'numeric', minute:'2-digit', hour12: true});
                 if(!groupedSales[v.date]) { groupedSales[v.date] = {}; }
                 if(!groupedSales[v.date][timeStr]) { groupedSales[v.date][timeStr] = { items: [], total: 0 }; }
@@ -954,7 +948,11 @@
                 groupedSales[v.date][timeStr].total += v.price;
             });
 
-            // Render Today Sales Grouped View (Chronological ascending order)
+            let sortedHistoryDates = Object.keys(salesByDate).sort((a,b) => a.split('/').reverse().join('').localeCompare(b.split('/').reverse().join('')));
+            sortedHistoryDates.forEach(dateStr => {
+                historyBody.innerHTML += `<tr><td>${dateStr}</td><td>৳ ${salesByDate[dateStr].toFixed(2)}</td></tr>`;
+            });
+
             todaySalesBody.innerHTML = "";
             let sortedSalesDates = Object.keys(groupedSales).sort((a,b) => a.split('/').reverse().join('').localeCompare(b.split('/').reverse().join('')));
             
@@ -1029,19 +1027,19 @@
             
             purchaseBody.innerHTML = "";
             let groupedPurchases = {}; 
+            let purchasesByDate = {}; // তারিখ অনুযায়ী মোট ক্রয়ের হিসাব রাখার জন্য
 
             s.forEach(child => {
                 const v = child.val();
-                let packDetails = v.pack_size ? ` [Pack: ${v.pack_size} ${v.pack_unit || ''}]` : '';
-                let fullDetails = `${v.qty} ${v.unit || ''}${packDetails}`;
 
                 if(v.date === todayStr) tB += v.cost;
                 if(v.date && v.date.includes(`/${curMonth}/${curYear}`)) mB += v.cost;
                 if(v.date && v.date.endsWith(`/${curYear}`)) yB += v.cost;
                 
-                purchaseBody.innerHTML += `<tr><td>${v.date}</td><td>${v.name}</td><td>${fullDetails}</td><td>৳${v.cost}</td></tr>`;
+                // প্রতিটি তারিখের মোট ক্রয় টাকা যোগ করা হচ্ছে
+                if(!purchasesByDate[v.date]) { purchasesByDate[v.date] = 0; }
+                purchasesByDate[v.date] += v.cost;
 
-                // Grouping by Date and Time
                 let timeStr = new Date(v.timestamp || Date.now()).toLocaleTimeString('en-US', {hour: 'numeric', minute:'2-digit', hour12: true});
                 if(!groupedPurchases[v.date]) { groupedPurchases[v.date] = {}; }
                 if(!groupedPurchases[v.date][timeStr]) { groupedPurchases[v.date][timeStr] = { items: [], total: 0 }; }
@@ -1050,7 +1048,12 @@
                 groupedPurchases[v.date][timeStr].total += v.cost;
             });
 
-            // Render Purchases Grouped View (Chronological ascending order)
+            // ক্রয় রিপোর্ট (তালিকা) তে তারিখ অনুযায়ী মোট টাকা ক্রমান্বয়ে (Ascending) প্রদর্শন
+            let sortedPurchHistoryDates = Object.keys(purchasesByDate).sort((a,b) => a.split('/').reverse().join('').localeCompare(b.split('/').reverse().join('')));
+            sortedPurchHistoryDates.forEach(dateStr => {
+                purchaseBody.innerHTML += `<tr><td>${dateStr}</td><td>৳ ${purchasesByDate[dateStr].toFixed(2)}</td></tr>`;
+            });
+
             medPurchaseBody.innerHTML = "";
             let sortedPurchDates = Object.keys(groupedPurchases).sort((a,b) => a.split('/').reverse().join('').localeCompare(b.split('/').reverse().join('')));
             
@@ -1115,7 +1118,7 @@
             const tbody = document.querySelector("#stock-table tbody"); tbody.innerHTML = "";
             s.forEach(child => {
                 const d = child.val();
-                let actualName = d.name || child.key; // Backward compatibility with older records
+                let actualName = d.name || child.key; 
                 let cls = d.stock < 10 ? "class='low-stock'" : "";
                 let packString = d.pack_size && d.pack_size !== "0" ? `${d.pack_size} ${d.pack_unit || ''}` : 'N/A';
                 
@@ -1139,7 +1142,6 @@
                 let safeName = (d.name || '').replace(/'/g, "\\'");
                 let safeMobile = (d.mobile || '').replace(/'/g, "\\'");
                 
-                // Show uploaded image if exists
                 let imgHtml = d.imageUrl ? `<br><a href="${d.imageUrl}" target="_blank"><img src="${d.imageUrl}" style="width:50px; height:50px; object-fit:cover; border-radius:5px; margin-top:5px; border:1px solid #ccc;"></a>` : '';
 
                 tbody.innerHTML += `<tr>
